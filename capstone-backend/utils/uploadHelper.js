@@ -1,0 +1,108 @@
+const cloudinary = require('../config/cloudinary');
+const multer = require('multer');
+
+// Multer memory storage for handling files in memory
+const memoryStorage = multer.memoryStorage();
+
+// File filter for images
+const imageFilter = (req, file, cb) => {
+  if (file.mimetype.startsWith('image/')) {
+    cb(null, true);
+  } else {
+    cb(new Error('Only image files are allowed!'), false);
+  }
+};
+
+// File filter for PDFs
+const pdfFilter = (req, file, cb) => {
+  if (file.mimetype === 'application/pdf') {
+    cb(null, true);
+  } else {
+    cb(new Error('Only PDF files are allowed!'), false);
+  }
+};
+
+// Multer configurations
+const uploadImage = multer({
+  storage: memoryStorage,
+  fileFilter: imageFilter,
+  limits: { fileSize: 5 * 1024 * 1024 } // 5MB limit for images
+});
+
+const uploadPDF = multer({
+  storage: memoryStorage,
+  fileFilter: pdfFilter,
+  limits: { fileSize: 20 * 1024 * 1024 } // 20MB limit for PDFs
+});
+
+// Upload to Cloudinary from buffer
+const uploadToCloudinary = (buffer, folder, resourceType = 'image', originalFilename = null) => {
+  return new Promise((resolve, reject) => {
+    const options = {
+      folder: `capstone-archive/${folder}`,
+      resource_type: resourceType === 'pdf' ? 'raw' : resourceType,
+      timeout: 120000,
+    };
+
+    // For PDFs, preserve the .pdf extension in public_id
+    if (resourceType === 'pdf' && originalFilename) {
+      const timestamp = Date.now();
+      const randomString = Math.random().toString(36).substring(7);
+      // Remove extension from original filename and add it back
+      const cleanName = originalFilename.replace(/\.pdf$/i, '');
+      const safeName = cleanName.replace(/[^a-zA-Z0-9]/g, '_').substring(0, 50);
+      options.public_id = `${safeName}_${timestamp}_${randomString}`;
+    }
+
+    if (resourceType === 'image') {
+      options.allowed_formats = ['jpg', 'png', 'jpeg', 'gif', 'webp'];
+    }
+
+    const uploadStream = cloudinary.uploader.upload_stream(
+      options,
+      (error, result) => {
+        if (error) {
+          console.error('Cloudinary upload error:', error);
+          reject(error);
+        } else {
+          let finalUrl = result.secure_url;
+          
+          // For PDFs, add fl_attachment flag to force download
+          if (resourceType === 'pdf') {
+            finalUrl = result.secure_url.replace(
+              '/raw/upload/',
+              '/raw/upload/fl_attachment/'
+            );
+          }
+          
+          resolve({
+            url: result.secure_url,
+            public_id: result.public_id,
+          });
+        }
+      }
+    );
+    
+    uploadStream.end(buffer);
+  });
+};
+
+// Delete from Cloudinary
+const deleteFromCloudinary = async (publicId, resourceType = 'image') => {
+  try {
+    const result = await cloudinary.uploader.destroy(publicId, {
+      resource_type: resourceType === 'pdf' ? 'raw' : resourceType
+    });
+    return result;
+  } catch (error) {
+    console.error('Cloudinary deletion error:', error);
+    throw error;
+  }
+};
+
+module.exports = {
+  uploadImage,
+  uploadPDF,
+  uploadToCloudinary,
+  deleteFromCloudinary
+};
