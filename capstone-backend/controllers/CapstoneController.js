@@ -4,12 +4,14 @@ const https = require("https");
 
 exports.getAllCapstone = async (req, res) => {
     try {
-        const capstone = await Capstone.find({
-            isDeleted: false,
-            isApproved: true
-        })
+        let query = { isDeleted: false };
+        // If admin, show all; if not, only approved
+        if (!req.user || (req.user.role && req.user.role.toLowerCase() !== 'admin')) {
+            query.isApproved = true;
+        }
+        const capstone = await Capstone.find(query)
         .select(
-            "_id previewImage title abstract members adviser year technologies pdfUrl pdfPublicId githubUrl createdBy approvedBy"
+            "_id previewImage title abstract members adviser year technologies pdfUrl pdfPublicId githubUrl createdBy approvedBy status isApproved"
         )
         .populate([
             {
@@ -86,35 +88,21 @@ exports.getRecentCapstones = async (req, res) => {
 exports.getCapstoneById = async (req, res) => {
     try {
         const capstoneId = req.params.capstoneId;
-        const specificCapstone = await Capstone.findOne({
-            _id: capstoneId,
-            isDeleted: false,
-            isApproved: true
-        })
-        .select(
-            "_id previewImage title abstract members adviser year technologies pdfUrl pdfPublicId githubUrl createdBy approvedBy"
-        )
-        .populate([
-            {
-                path: "createdBy",
-                select: "_id fullName email",
-            },
-            {
-                path: "approvedBy",
-                select: "_id fullName email"
-            }
-        ]);
-
-        if (!specificCapstone) {
-            return res.status(404).send({
-                message: `Capstone with the ID: ${capstoneId} not found!`,
-            })
+        let query = { _id: capstoneId, isDeleted: false };
+        // If not admin, only allow approved capstones
+        if (!req.user || (req.user.role && req.user.role.toLowerCase() !== 'admin')) {
+            query.isApproved = true;
         }
-
-        return res.status(200).send({
-            messgae: `Capstone with the ID: ${capstoneId} found!`,
-            data: specificCapstone,
-        })
+        const specificCapstone = await Capstone.findOne(query)
+            .select("_id previewImage title abstract members adviser year technologies pdfUrl pdfPublicId githubUrl createdBy approvedBy status isApproved")
+            .populate([
+                { path: "createdBy", select: "_id fullName email" },
+                { path: "approvedBy", select: "_id fullName email" }
+            ]);
+        if (!specificCapstone) {
+            return res.status(404).send({ message: `Capstone with the ID: ${capstoneId} not found!` });
+        }
+        return res.status(200).send({ message: `Capstone with the ID: ${capstoneId} found!`, data: specificCapstone });
     } catch (err) {
         console.log(`Specific Capstone Fetching Error: ${err}`);
         return res.status(500).send({
@@ -199,8 +187,8 @@ exports.addCapstone = async (req, res) => {
             pdfPublicId: pdfResult.public_id,
             githubUrl: githubUrl || '',
             createdBy: req.user.id, // Important!
-            isApproved: false,
-            status: 'pending'
+            isApproved: true,
+            status: 'approved'
         });
 
         await newCapstone.save();
@@ -393,10 +381,10 @@ exports.deleteCapstoneById = async (req, res) => {
     try {
         const capstoneId = req.params.capstoneId;
 
+        // Allow admin to delete any capstone (pending, approved, etc.)
         const specificCapstone = await Capstone.findOne({
             _id: capstoneId,
-            isDeleted: false,
-            isApproved: true
+            isDeleted: false
         });
 
         if(!specificCapstone) {

@@ -1,0 +1,27 @@
+body {
+	font-family: Arial, sans-serif;
+	margin: 0;
+	padding: 0;
+	/* Metallic blue-green gradient background */
+	background-color: #0f4c4b; /* fallback */
+	background-image: linear-gradient(135deg, #0f4c4b 0%, #1b6b6a 40%, #4fb6ad 100%);
+	color: #111;
+}
+
+.menu-card { cursor: pointer; }
+.menu-card .item-img { height: 140px; object-fit: cover; }
+.sticky-top .card-body { padding: 1rem; }
+.list-group-item.active { background-color: #0d6efd; border-color: #0d6efd; }
+
+/* Auth modal styling (non-white forms) */
+.auth-modal { background: linear-gradient(180deg,#083f3e 0%, #0f6b68 100%); color:#fff; }
+.auth-modal .modal-header, .auth-modal .modal-footer { border: none; color: #fff; }
+.auth-modal .form-control { background: rgba(255,255,255,0.06); color: #fff; border: 1px solid rgba(255,255,255,0.08); }
+.auth-modal .form-control::placeholder { color: rgba(255,255,255,0.7); }
+.auth-modal .btn-primary { background-color: #0d9b94; border-color: #0d9b94; }
+.auth-modal .btn-secondary { background-color: rgba(255,255,255,0.06); color: #fff; border-color: rgba(255,255,255,0.06); }
+
+@media (max-width: 767px){
+	.sticky-top { position: static !important; }
+}
+
