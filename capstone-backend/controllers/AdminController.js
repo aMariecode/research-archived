@@ -124,13 +124,17 @@ exports.getAllArchivedCapstones = async (req, res) => {
 exports.getAllSubmittedCapstonesByStatus = async (req, res) => {
     try {
         const status = req.params.status;
-        const submittedCapstones = await Capstone.find({
+        const query = {
             status: status,
-            isDeleted: false,
-            isApproved: true
-        })
+            isDeleted: false
+        };
+        // Only non-admins require isApproved: true
+        if (!req.user || (req.user.role && req.user.role.toLowerCase() !== 'admin')) {
+            query.isApproved = true;
+        }
+        const submittedCapstones = await Capstone.find(query)
         .select(
-            "_id previewImage title abstract members adviser year technologies pdfUrl pdfPublicId githubUrl createdBy approvedBy"
+            "_id previewImage title abstract members adviser year technologies pdfUrl pdfPublicId githubUrl createdBy approvedBy status isApproved"
         )
         .sort({ createdAt: 1 });
 
@@ -172,7 +176,7 @@ exports.disableUserById = async (req, res) => {
             });
         }
 
-        if (specificUser.role === "admin") {
+        if ((specificUser.role || '').toLowerCase() === "admin") {
             return res.status(403).send({
                 message: "Unauthorized: Forbidden to modify admin account."
             });
@@ -209,7 +213,7 @@ exports.enableUserById = async (req, res) => {
             });
         }
 
-        if (specificUser.role === "admin") {
+        if ((specificUser.role || '').toLowerCase() === "admin") {
             return res.status(403).send({
                 message: "Unauthorized: Forbidden to modify admin account."
             });

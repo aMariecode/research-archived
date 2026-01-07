@@ -80,6 +80,10 @@ module.exports.login = async (req, res, next) => {
         email: String(email).toLowerCase().trim() 
     }).select("+password");
 
+    console.log('Login attempt for:', String(email).toLowerCase().trim());
+    console.log('Found user?', !!user);
+    if (user) console.log('user flags: isDeleted=', user.isDeleted, 'isDisabled=', user.isDisabled, 'passwordHashExists=', !!user.password);
+
     if (!user || user.isDeleted) {
         return res.status(401).send({ 
             message: "Invalid credentials" 
@@ -93,6 +97,7 @@ module.exports.login = async (req, res, next) => {
     };
 
     const isPasswordCorrect = await bcrypt.compare(password, user.password);
+    console.log('password compare result:', isPasswordCorrect);
     if (!isPasswordCorrect) {
         return res.status(401).send({ 
             message: "Invalid credentials" 

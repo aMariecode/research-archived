@@ -20,7 +20,8 @@ exports.getOverview = async (req, res) => {
       if (endDate) capstoneMatch.createdAt.$lte = endDate;
     }
 
-    const [usersTotal, usersActive, capstoneCounts] = await Promise.all([
+    const AnalyticsEvent = require('../models/AnalyticsEvent');
+    const [usersTotal, usersActive, capstoneCounts, visits, views, downloads] = await Promise.all([
       User.countDocuments({}),
       User.countDocuments({ isDeleted: false, isDisabled: false }),
       Capstone.aggregate([
@@ -45,6 +46,9 @@ exports.getOverview = async (req, res) => {
           },
         },
       ]),
+      AnalyticsEvent.countDocuments({ type: 'visit' }),
+      AnalyticsEvent.countDocuments({ type: 'view' }),
+      AnalyticsEvent.countDocuments({ type: 'download' })
     ]);
 
     const c = capstoneCounts[0] || {
@@ -59,8 +63,8 @@ exports.getOverview = async (req, res) => {
     return res.status(200).send({
       message: "Analytics overview",
       data: {
-        users: { total: usersTotal, active: usersActive },
-        capstones: c,
+        users: { total: usersTotal, active: usersActive, visits: visits || 0 },
+        capstones: { ...c, views: views || 0, downloads: downloads || 0 },
         range: { startDate: startDate || null, endDate: endDate || null },
       },
     });
