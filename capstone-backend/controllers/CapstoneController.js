@@ -253,6 +253,7 @@ exports.downloadCapstonePdf = async (req, res) => {
     }
 };
 
+// ---------------- Update Capstone ----------------
 exports.updateCapstone = async (req, res) => {
     try {
         const capstone = await Capstone.findById(req.params.id);
@@ -262,23 +263,12 @@ exports.updateCapstone = async (req, res) => {
         }
 
         // Only Admin or owner can update
-        if (
-            specificCapstone.createdBy.toString() !== req.user.id &&
-            req.user.role !== "Admin"
-        ) {
+        const isAdmin = req.user.role === "Admin";
+        if (capstone.createdBy.toString() !== req.user.id && !isAdmin) {
             return res.status(403).send({ message: "Not authorized." });
         }
 
-        // Update text fields (only if provided)
-        const {
-            title,
-            abstract,
-            members,
-            adviser,
-            year,
-            technologies,
-            githubUrl,
-        } = req.body;
+        const { title, abstract, members, adviser, year, technologies, githubUrl } = req.body;
 
         if (title !== undefined) capstone.title = title;
         if (abstract !== undefined) capstone.abstract = abstract;
@@ -286,30 +276,26 @@ exports.updateCapstone = async (req, res) => {
         if (githubUrl !== undefined) capstone.githubUrl = githubUrl;
 
         if (year !== undefined) {
-        const yearNum = parseInt(year);
-        const now = new Date().getFullYear();
-        if (Number.isNaN(yearNum) || yearNum <= 1900 || yearNum > now + 1) {
-            return res.status(400).send({ message: "Invalid Year!" });
-        }
-        capstone.year = yearNum;
+            const yearNum = parseInt(year);
+            const now = new Date().getFullYear();
+            if (Number.isNaN(yearNum) || yearNum <= 1900 || yearNum > now + 1) {
+                return res.status(400).send({ message: "Invalid Year!" });
+            }
+            capstone.year = yearNum;
         }
 
-        // Accept members/technologies as:
-        // - JSON string: ["A","B"]
-        // - plain string: "John"  => ["John"]
-        // - array already
         const parseToArray = (value) => {
-        if (value === undefined || value === null) return undefined;
-        if (Array.isArray(value)) return value;
-        if (typeof value !== "string") return [String(value)];
-        const trimmed = value.trim();
-        if (!trimmed) return [];
-        try {
-            const parsed = JSON.parse(trimmed);
-            return Array.isArray(parsed) ? parsed : [String(parsed)];
-        } catch {
-            return [trimmed];
-        }
+            if (value === undefined || value === null) return undefined;
+            if (Array.isArray(value)) return value;
+            if (typeof value !== "string") return [String(value)];
+            const trimmed = value.trim();
+            if (!trimmed) return [];
+            try {
+                const parsed = JSON.parse(trimmed);
+                return Array.isArray(parsed) ? parsed : [String(parsed)];
+            } catch {
+                return [trimmed];
+            }
         };
 
         const parsedMembers = parseToArray(members);
@@ -319,45 +305,37 @@ exports.updateCapstone = async (req, res) => {
         if (parsedTechnologies !== undefined) capstone.technologies = parsedTechnologies;
 
         // Handle file updates
-        // previewImage (image)
         if (req.files?.previewImage?.[0]) {
-        if (capstone.previewImage?.public_id) {
-            await deleteFromCloudinary(capstone.previewImage.public_id, "image");
+            if (capstone.previewImage?.public_id) {
+                await deleteFromCloudinary(capstone.previewImage.public_id, "image");
+            }
+            const imageResult = await uploadToCloudinary(
+                req.files.previewImage[0].buffer,
+                "previews",
+                "image"
+            );
+            capstone.previewImage = {
+                url: imageResult.url,
+                public_id: imageResult.public_id,
+            };
         }
 
-        const imageResult = await uploadToCloudinary(
-            req.files.previewImage[0].buffer,
-            "previews",
-            "image"
-        );
-
-        capstone.previewImage = {
-            url: imageResult.url,
-            public_id: imageResult.public_id,
-        };
-        }
-
-        // pdfFile (pdf as raw)
         if (req.files?.pdfFile?.[0]) {
-        // delete old pdf using stored public_id (most reliable)
-        if (capstone.pdfPublicId) {
-            await deleteFromCloudinary(capstone.pdfPublicId, "pdf");
+            if (capstone.pdfPublicId) {
+                await deleteFromCloudinary(capstone.pdfPublicId, "pdf");
+            }
+            const pdfResult = await uploadToCloudinary(
+                req.files.pdfFile[0].buffer,
+                "pdfs",
+                "pdf",
+                req.files.pdfFile[0].originalname
+            );
+            capstone.pdfUrl = pdfResult.url;
+            capstone.pdfPublicId = pdfResult.public_id;
         }
 
-        const pdfResult = await uploadToCloudinary(
-            req.files.pdfFile[0].buffer,
-            "pdfs",
-            "pdf",
-            req.files.pdfFile[0].originalname
-        );
-
-        capstone.pdfUrl = pdfResult.url;
-        capstone.pdfPublicId = pdfResult.public_id; // store for future deletions
-        }
-
-        // If non-admin edits, keep approval as-is (optional safety)
+        // Prevent non-admins from changing approval status
         if (!isAdmin) {
-            // prevent users from approving themselves via body
             capstone.isApproved = capstone.isApproved;
             capstone.status = capstone.status;
         }
@@ -377,33 +355,22 @@ exports.updateCapstone = async (req, res) => {
     }
 };
 
+// ---------------- Delete Capstone ----------------
 exports.deleteCapstoneById = async (req, res) => {
     try {
         const capstoneId = req.params.capstoneId;
+        const specificCapstone = await Capstone.findOne({ _id: capstoneId, isDeleted: false });
 
-        // Allow admin to delete any capstone (pending, approved, etc.)
-        const specificCapstone = await Capstone.findOne({
-            _id: capstoneId,
-            isDeleted: false
-        });
-
-        if(!specificCapstone) {
-            return res.send({
-                message: `Capstone with the ID: ${capstoneId} not found!`
-            });
+        if (!specificCapstone) {
+            return res.status(404).send({ message: `Capstone with the ID: ${capstoneId} not found!` });
         }
 
-        if(
-            specificCapstone.createdBy.toString() !== req.user.id && req.user.role !== "Admin"
-        ) {
-            return res.status(403).send({
-                message: "Not authorized."
-            });
+        if (specificCapstone.createdBy.toString() !== req.user.id && req.user.role !== "Admin") {
+            return res.status(403).send({ message: "Not authorized." });
         }
 
         specificCapstone.isDeleted = true;
         specificCapstone.deletedAt = new Date();
-
         await specificCapstone.save();
 
         return res.status(200).send({
@@ -417,33 +384,22 @@ exports.deleteCapstoneById = async (req, res) => {
         });
     } catch (err) {
         console.log(`Specific Capstone Archival Error: ${err}`);
-        return res.send({
-            message: "Server error when archiving capstone",
-        });
+        return res.status(500).send({ message: "Server error when archiving capstone" });
     }
-}
+};
 
+// ---------------- Restore Capstone ----------------
 exports.restoreCapstoneById = async (req, res) => {
     try {
         const capstoneId = req.params.capstoneId;
-         const specificCapstone = await Capstone.findOne({
-            _id: capstoneId,
-            isDeleted: true,
-            isApproved: true
-        });
+        const specificCapstone = await Capstone.findOne({ _id: capstoneId, isDeleted: true });
 
-        if(!specificCapstone) {
-            return res.status(404).send({
-                message: `Archived capstone with the ID: ${capstoneId} not found!`
-            });
+        if (!specificCapstone) {
+            return res.status(404).send({ message: `Archived capstone with the ID: ${capstoneId} not found!` });
         }
 
-        if(
-            specificCapstone.createdBy.toString() !== req.user.id && req.user.role !== "Admin"
-        ) {
-            return res.status(403).send({
-                message: "Not authorized to restore this capstone."
-            });
+        if (specificCapstone.createdBy.toString() !== req.user.id && req.user.role !== "Admin") {
+            return res.status(403).send({ message: "Not authorized to restore this capstone." });
         }
 
         specificCapstone.isDeleted = false;
@@ -458,11 +414,9 @@ exports.restoreCapstoneById = async (req, res) => {
                 isDeleted: specificCapstone.isDeleted,
                 deletedAt: specificCapstone.deletedAt
             }
-        })
+        });
     } catch (err) {
         console.log(`Specific Capstone Restoration Error: ${err}`);
-        return res.send({
-            message: "Server error when restoring capstone",
-        });
+        return res.status(500).send({ message: "Server error when restoring capstone" });
     }
-}
+};
