@@ -8,7 +8,7 @@ exports.getAllUsers = async (req, res) => {
             isDeleted: false,
         })
         .select(
-            "_id ullName email role"
+            "_id fullName email role lastLogin"
         );
 
         if(!users || users.length === 0) {
@@ -98,7 +98,7 @@ exports.getAllArchivedCapstones = async (req, res) => {
             isApproved: true
         })
         .select(
-            "_id previewImage title abstract members adviser year technologies pdfUrl pdfPublicId githubUrl createdBy approvedBy"
+            "_id title abstract members adviser year technologies pdfUrl pdfPublicId githubUrl createdBy approvedBy"
         )
         .sort({ year: -1 });
 
@@ -134,7 +134,7 @@ exports.getAllSubmittedCapstonesByStatus = async (req, res) => {
         }
         const submittedCapstones = await Capstone.find(query)
         .select(
-            "_id previewImage title abstract members adviser year technologies pdfUrl pdfPublicId githubUrl createdBy approvedBy status isApproved"
+            "_id title abstract members adviser year technologies pdfUrl pdfPublicId githubUrl createdBy approvedBy status isApproved"
         )
         .sort({ createdAt: 1 });
 
@@ -304,7 +304,7 @@ exports.rejectCapstoneById = async (req, res) => {
         }
 
         // Delete Cloudinary assets first (so we only mark rejected if cleanup succeeds)
-        const imagePublicId = capstone.previewImage?.public_id;
+        // previewImage fully removed from model and logic
         if (imagePublicId) {
             await deleteFromCloudinary(imagePublicId, "image");
         }

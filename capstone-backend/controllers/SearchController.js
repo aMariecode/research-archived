@@ -40,29 +40,19 @@ exports.searchCapstones = async (req, res) => {
       });
     }
 
-    // Still only approved + not deleted
-    let mongoQuery;
-    let sort;
-
-    if (keywords.length < 3) {
-      // Typeahead / partial matching
-      const rx = new RegExp(escapeRegex(keywords), "i");
-      mongoQuery = {
-        ...baseFilter,
-        $or: [
-          { title: rx },
-          { abstract: rx },
-          { adviser: rx },
-          { technologies: rx }, // works with arrays
-          { members: rx },      // works with arrays
-        ],
-      };
-      sort = { year: -1 };
-    } else {
-      // Full text relevance
-      mongoQuery = { ...baseFilter, $text: { $search: keywords } };
-      sort = { score: { $meta: "textScore" }, year: -1 };
-    }
+    // Fix: Always allow partial match for author (members) and title, even for single word
+    const rx = new RegExp(escapeRegex(keywords), "i");
+    mongoQuery = {
+      ...baseFilter,
+      $or: [
+        { title: rx },
+        { abstract: rx },
+        { adviser: rx },
+        { technologies: rx },
+        { members: rx },
+      ],
+    };
+    sort = { year: -1 };
 
     const results = await Capstone.find(
       mongoQuery,
@@ -92,7 +82,8 @@ exports.filterCapstones = async (req, res) => {
     const adviserRaw = req.query.adviser;
     const createdByRaw = req.query.createdBy;
 
-    const filter = { ...baseFilter };
+    // For year filter, show all capstones regardless of approval/deletion
+    const filter = {};
 
     if (yearRaw !== undefined && String(yearRaw).trim() !== "") {
       const year = Number(yearRaw);

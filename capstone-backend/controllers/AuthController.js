@@ -104,11 +104,14 @@ module.exports.login = async (req, res, next) => {
         });
     }
 
+    // Update lastLogin timestamp
+    user.lastLogin = new Date();
+    await user.save();
     return res.status(200).send({
         message: `Login Successful`,
-        user: { id: user._id, fullName: user.fullName, email: user.email, role: user.role },
+        user: { id: user._id, fullName: user.fullName, email: user.email, role: user.role, lastLogin: user.lastLogin },
         accessToken: createAccessToken(user),
-        });
+    });
     } catch (err) {
         console.error("Login Error:", err);
         return res.status(500).send({ 
