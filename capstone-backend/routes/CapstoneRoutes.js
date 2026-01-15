@@ -1,4 +1,16 @@
 const router = require("express").Router();
+const path = require('path');
+// Test endpoint: serve a known-good PDF for inline viewing debug
+router.get('/test-inline-pdf', (req, res) => {
+    const filePath = path.join(__dirname, '../../capstone-frontend/public/test.pdf');
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', 'inline; filename="test.pdf"');
+    res.sendFile(filePath, err => {
+        if (err) {
+            res.status(500).send('Failed to send test PDF');
+        }
+    });
+});
 // Analytics endpoints for file view/download
 const AnalyticsEvent = require('../models/AnalyticsEvent');
 router.post('/analytics/view/:capstoneId', async (req, res) => {

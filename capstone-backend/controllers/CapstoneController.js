@@ -1,17 +1,16 @@
 const Capstone = require("../models/Capstone.js");
 const { uploadToCloudinary, deleteFromCloudinary } = require('../utils/uploadHelper');
 const https = require("https");
+const axios = require('../utils/axios');
 
 exports.getAllCapstone = async (req, res) => {
     try {
         let query = { isDeleted: false };
-        // If admin, show all; if not, only approved
-        if (!req.user || (req.user.role && req.user.role.toLowerCase() !== 'admin')) {
-            query.isApproved = true;
-        }
+        // Show all capstones to all users (admin or not)
+        // If you want to hide unapproved capstones from users, add a filter here
         const capstone = await Capstone.find(query)
         .select(
-            "_id previewImage title abstract members adviser year technologies pdfUrl pdfPublicId githubUrl createdBy approvedBy status isApproved"
+            "_id title abstract members adviser year technologies pdfUrl pdfPublicId githubUrl createdBy approvedBy status isApproved"
         )
         .populate([
             {
@@ -51,7 +50,7 @@ exports.getRecentCapstones = async (req, res) => {
             isApproved: true
         })
         .select(
-            "_id previewImage title abstract members adviser year technologies pdfUrl pdfPublicId githubUrl createdBy approvedBy"
+            "_id title abstract members adviser year technologies pdfUrl pdfPublicId githubUrl createdBy approvedBy"
         )
         .populate([
             {
@@ -89,12 +88,9 @@ exports.getCapstoneById = async (req, res) => {
     try {
         const capstoneId = req.params.capstoneId;
         let query = { _id: capstoneId, isDeleted: false };
-        // If not admin, only allow approved capstones
-        if (!req.user || (req.user.role && req.user.role.toLowerCase() !== 'admin')) {
-            query.isApproved = true;
-        }
+        // Show all capstones to all users (admin or not)
         const specificCapstone = await Capstone.findOne(query)
-            .select("_id previewImage title abstract members adviser year technologies pdfUrl pdfPublicId githubUrl createdBy approvedBy status isApproved")
+            .select("_id title abstract members adviser year technologies pdfUrl pdfPublicId githubUrl createdBy approvedBy status isApproved")
             .populate([
                 { path: "createdBy", select: "_id fullName email" },
                 { path: "approvedBy", select: "_id fullName email" }
@@ -134,9 +130,9 @@ exports.addCapstone = async (req, res) => {
         }
 
         // Validate files
-        if (!req.files || !req.files.previewImage || !req.files.pdfFile) {
+        if (!req.files || !req.files.pdfFile) {
             return res.status(400).send({
-                message: "Preview image and PDF file are required"
+                message: "PDF file is required"
             });
         }
 
@@ -149,14 +145,7 @@ exports.addCapstone = async (req, res) => {
             });
         }
 
-        console.log('Uploading preview image...');
-        // Upload preview image
-        const imageResult = await uploadToCloudinary(
-            req.files.previewImage[0].buffer,
-            'previews',
-            'image'
-        );
-        console.log('Image uploaded:', imageResult.url);
+
 
         console.log('Uploading PDF...');
         // Upload PDF with original filename
@@ -175,10 +164,6 @@ exports.addCapstone = async (req, res) => {
         const newCapstone = new Capstone({
             title,
             abstract,
-            previewImage: {
-            url: imageResult.url,
-            public_id: imageResult.public_id
-            },
             members: parsedMembers, // Fixed typo
             adviser: adviser || '',
             year: yearNum,
@@ -231,22 +216,22 @@ exports.downloadCapstonePdf = async (req, res) => {
             .trim()
             .replace(/\s+/g, "_");
 
+        // Set Content-Disposition based on ?download=1 param
         res.setHeader("Content-Type", "application/pdf");
-        res.setHeader("Content-Disposition", `attachment; filename="${safeName}.pdf"`);
-
-        https.get(capstone.pdfUrl, (cloudRes) => {
-            // Pass through errors
-            if (cloudRes.statusCode && cloudRes.statusCode >= 400) {
-                return res
-                .status(cloudRes.statusCode)
-                .send({ message: "Failed to fetch PDF from storage" });
-            }
-
-            cloudRes.pipe(res);
-        }).on("error", (e) => {
-            console.error("PDF proxy error:", e);
+        if (req.query.download === '1') {
+            res.setHeader("Content-Disposition", `attachment; filename=\"${safeName}.pdf\"`);
+            console.log("[PDF] Content-Disposition: attachment; filename=", `${safeName}.pdf`);
+        } else {
+            res.setHeader("Content-Disposition", `inline; filename=\"${safeName}.pdf\"`);
+            console.log("[PDF] Content-Disposition: inline; filename=", `${safeName}.pdf`);
+        }
+        try {
+            const response = await axios.get(capstone.pdfUrl, { responseType: 'stream' });
+            response.data.pipe(res);
+        } catch (e) {
+            console.error("PDF proxy error (axios):", e);
             res.status(500).send({ message: "Failed to download PDF" });
-        });
+        }
     } catch (err) {
         console.error("downloadCapstonePdf error:", err);
         res.status(500).send({ message: "Server error" });
@@ -304,21 +289,7 @@ exports.updateCapstone = async (req, res) => {
         const parsedTechnologies = parseToArray(technologies);
         if (parsedTechnologies !== undefined) capstone.technologies = parsedTechnologies;
 
-        // Handle file updates
-        if (req.files?.previewImage?.[0]) {
-            if (capstone.previewImage?.public_id) {
-                await deleteFromCloudinary(capstone.previewImage.public_id, "image");
-            }
-            const imageResult = await uploadToCloudinary(
-                req.files.previewImage[0].buffer,
-                "previews",
-                "image"
-            );
-            capstone.previewImage = {
-                url: imageResult.url,
-                public_id: imageResult.public_id,
-            };
-        }
+        // previewImage removed
 
         if (req.files?.pdfFile?.[0]) {
             if (capstone.pdfPublicId) {
