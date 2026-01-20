@@ -158,6 +158,46 @@ exports.getAllSubmittedCapstonesByStatus = async (req, res) => {
     }
 }
 
+exports.getAllCapstones = async (req, res) => {
+    try {
+        const allCapstones = await Capstone.find({
+            isDeleted: false
+        })
+        .select(
+            "_id title abstract members adviser year technologies pdfUrl pdfPublicId githubUrl createdBy approvedBy status isApproved"
+        )
+        .populate([
+            {
+                path: "createdBy",
+                select: "_id fullName email",
+            },
+            {
+                path: "approvedBy",
+                select: "_id fullName email"
+            }
+        ])
+        .sort({ year: -1 });
+
+        if(!allCapstones || allCapstones.length === 0){
+            return res.status(200).send({
+                message: `There are no capstones found!`,
+                data: []
+            });
+        }
+
+        return res.status(200).send({
+            message: `List of all capstones:`,
+            data: allCapstones
+        })
+
+    } catch (err) {
+        console.log(`All Capstones Fetching Error: ${err}`);
+        return res.status(500).send({
+            message: "Server error when fetching capstones",
+        });
+    }
+}
+
 exports.disableUserById = async (req, res) => {
     try {
         const userId = req.params.userId;

@@ -78,6 +78,44 @@ exports.getRecentCapstones = async (req, res) => {
 
     } catch (err) {
         console.log(`Capstone Fetching Error: ${err}`);
+    }
+}
+
+exports.getApprovedCapstones = async (req, res) => {
+    try {
+        const capstone = await Capstone.find({
+            isDeleted: false,
+            isApproved: true
+        })
+        .select(
+            "_id title abstract members adviser year technologies pdfUrl pdfPublicId githubUrl createdBy approvedBy previewImage"
+        )
+        .populate([
+            {
+                path: "createdBy",
+                select: "_id fullName email",
+            },
+            {
+                path: "approvedBy",
+                select: "_id fullName email"
+            }
+        ])
+        .sort({ year: -1 });
+
+        if(!capstone || capstone.length === 0) {
+            return res.status(200).send({
+                message: "No capstone projects found!",
+                data: [],
+            })
+        };
+
+        return res.status(200).send({
+            message: "Approved Capstone Project Lists:",
+            data: capstone
+        });
+
+    } catch (err) {
+        console.log(`Capstone Fetching Error: ${err}`);
         return res.status(500).send({
             message: "Server error when fetching capstones",
         });

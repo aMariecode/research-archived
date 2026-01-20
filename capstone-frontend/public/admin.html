@@ -1,538 +1,808 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Admin Dashboard — Capstone Archive</title>
+  <title>Admin Dashboard — UA Research Archive</title>
   <link rel="stylesheet" href="style.css">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-  <style>
-    body { background: linear-gradient(135deg,#083f3e 0%, #0f6b68 40%, #4fb6ad 100%); color:#fff; }
-    .panel { background: rgba(255,255,255,0.04); border-radius:10px; padding:1rem; }
-    .table thead th { color: #fff; }
-    .muted-light { color: rgba(255,255,255,0.75); }
-    .admin-actions .btn { margin-right:0.4rem; }
-  </style>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
 </head>
 <body>
-  <nav class="navbar navbar-dark bg-dark">
-    <div class="container-fluid">
-      <span class="navbar-brand mb-0 h1">Admin Dashboard</span>
-      <div class="d-flex">
-        <a class="btn btn-outline-light btn-sm me-2" href="/">Kiosk</a>
-        <button id="openChangePassword" class="btn btn-outline-light btn-sm me-2">Change password</button>
-        <button id="adminLogout" class="btn btn-outline-light btn-sm">Logout</button>
+  <div class="admin-layout">
+    <!-- Sidebar -->
+    <aside class="admin-sidebar">
+      <div class="admin-sidebar-brand">
+        <img src="ua-seal.png" alt="University of the Assumption" class="admin-sidebar-brand-icon">
+        <div>
+          <h2>UA Admin</h2>
+          <span>Management Panel</span>
+        </div>
       </div>
-    </div>
-  </nav>
+      
+      <ul class="admin-nav">
+        <li><a href="#" class="active" onclick="showSection('dashboard')"><i class="bi bi-speedometer2"></i> Dashboard</a></li>
+        <li><a href="#" onclick="showSection('capstones')"><i class="bi bi-collection"></i> Capstones</a></li>
+        <li><a href="#" onclick="showSection('users')"><i class="bi bi-people"></i> Users</a></li>
+        <div class="admin-nav-divider"></div>
+        <li><a href="/index.html"><i class="bi bi-house"></i> View Library</a></li>
+        <li><a href="#" onclick="logout()"><i class="bi bi-box-arrow-right"></i> Logout</a></li>
+      </ul>
+    </aside>
 
-  <div class="container mt-4">
-    <div id="notAuthorized" class="alert alert-warning" style="display:none">
-      You are not authorized to view the admin dashboard. Please sign in with an admin account.
-    </div>
+    <!-- Main Content -->
+    <main class="admin-main">
+      <!-- Not Authorized -->
+      <div id="notAuthorized" class="alert alert-warning" style="display:none">
+        <i class="bi bi-exclamation-triangle"></i> You are not authorized to view this page. Please sign in with an admin account.
+        <a href="/login.html" class="btn btn-sm btn-primary ms-3">Sign In</a>
+      </div>
 
-    <div id="adminArea" style="display:none">
-      <div class="row mb-3">
-        <div class="col-md-8">
-          <div class="panel">
-            <div class="d-flex justify-content-between align-items-center mb-2">
-              <h5 class="mb-0">Capstones</h5>
-              <div>
-                <button id="btnAddCapstone" class="btn btn-sm btn-outline-light">Add Capstone</button>
+      <div id="adminContent" style="display:none">
+        <!-- Header -->
+        <div class="admin-header">
+          <h1 id="sectionTitle"><i class="bi bi-speedometer2"></i> Dashboard</h1>
+          <div class="d-flex align-items-center gap-3">
+            <span class="text-muted">Welcome, <strong id="adminName">Admin</strong></span>
+            <button class="btn btn-outline-primary btn-sm" onclick="openChangePassword()">
+              <i class="bi bi-key"></i> Change Password
+            </button>
+          </div>
+        </div>
+
+        <!-- Dashboard Section -->
+        <div id="dashboardSection">
+          <!-- Stats Cards -->
+          <div class="admin-cards">
+            <div class="admin-card">
+              <div class="admin-card-header">
+                <div>
+                  <div class="admin-card-value" id="statTotalProjects">0</div>
+                  <div class="admin-card-label">Total Projects</div>
+                </div>
+                <div class="admin-card-icon blue"><i class="bi bi-collection"></i></div>
               </div>
             </div>
-            <div class="mb-2 d-flex align-items-center justify-content-between">
-              <!-- Removed status tab buttons -->
-              <div class="d-flex align-items-center">
-                <label class="me-2 small muted-light">Batch / Year:</label>
-                <select id="yearFilter" class="form-select form-select-sm" style="width:160px">
-                  <option value="all">All years</option>
-                </select>
+            <div class="admin-card">
+              <div class="admin-card-header">
+                <div>
+                  <div class="admin-card-value" id="statApproved">0</div>
+                  <div class="admin-card-label">Approved</div>
+                </div>
+                <div class="admin-card-icon green"><i class="bi bi-check-circle"></i></div>
               </div>
             </div>
-            <div id="capstoneList" class="table-responsive">
-              <table class="table table-dark table-striped table-sm mb-0">
-                <thead><tr><th>Actions</th></tr></thead>
-                <thead><tr><th>Capstone</th><th>Actions</th></tr></thead>
-                <tbody id="capstoneTbody"></tbody>
+            <div class="admin-card">
+              <div class="admin-card-header">
+                <div>
+                  <div class="admin-card-value" id="statPending">0</div>
+                  <div class="admin-card-label">Pending</div>
+                </div>
+                <div class="admin-card-icon gold"><i class="bi bi-clock"></i></div>
+              </div>
+            </div>
+            <div class="admin-card">
+              <div class="admin-card-header">
+                <div>
+                  <div class="admin-card-value" id="statUsers">0</div>
+                  <div class="admin-card-label">Total Users</div>
+                </div>
+                <div class="admin-card-icon blue"><i class="bi bi-people"></i></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Recent Activity -->
+          <div class="row">
+            <div class="col-lg-8">
+              <div class="admin-panel">
+                <div class="admin-panel-header">
+                  <h3><i class="bi bi-clock-history"></i> Recent Capstones</h3>
+                </div>
+                <div class="admin-panel-body">
+                  <table class="data-table">
+                    <thead>
+                      <tr>
+                        <th>Title</th>
+                        <th>Year</th>
+                        <th>Status</th>
+                        <th>Date</th>
+                      </tr>
+                    </thead>
+                    <tbody id="recentCapstones">
+                      <tr><td colspan="4" class="text-center text-muted">Loading...</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+            <div class="col-lg-4">
+              <div class="admin-panel">
+                <div class="admin-panel-header">
+                  <h3><i class="bi bi-bar-chart"></i> Analytics</h3>
+                </div>
+                <div class="admin-panel-body">
+                  <div class="d-flex justify-content-between align-items-center mb-3">
+                    <span>File Views</span>
+                    <strong id="analyticsViews">0</strong>
+                  </div>
+                  <div class="d-flex justify-content-between align-items-center mb-3">
+                    <span>Downloads</span>
+                    <strong id="analyticsDownloads">0</strong>
+                  </div>
+                  <div class="d-flex justify-content-between align-items-center mb-3">
+                    <span>Site Visits</span>
+                    <strong id="analyticsSiteVisits">0</strong>
+                  </div>
+                  <div class="d-flex justify-content-between align-items-center">
+                    <span>Active Users</span>
+                    <strong id="analyticsActiveUsers">0</strong>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Capstones Section -->
+        <div id="capstonesSection" style="display:none">
+          <div class="admin-panel">
+            <div class="admin-panel-header">
+              <h3><i class="bi bi-collection"></i> Manage Capstones</h3>
+              <button class="btn btn-primary btn-sm" onclick="openAddCapstone()">
+                <i class="bi bi-plus-lg"></i> Add Capstone
+              </button>
+            </div>
+
+            <div class="admin-panel-body">
+              <div class="mb-3 d-flex justify-content-between align-items-center">
+                <div class="d-flex align-items-center gap-2">
+                  <label class="text-muted">Year:</label>
+                  <select class="filter-select" id="yearFilter" onchange="applyCapstoneFilters()">
+                    <option value="all">All Years</option>
+                  </select>
+                </div>
+                <input type="text" class="form-control" style="max-width: 250px;" placeholder="Search..." id="capstoneSearch" oninput="applyCapstoneFilters()">
+              </div>
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th style="width: 40%;">Title</th>
+                    <th>Authors</th>
+                    <th>Year</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="capstoneTbody">
+                  <tr><td colspan="4" class="text-center text-muted">Loading...</td></tr>
+                </tbody>
               </table>
             </div>
           </div>
         </div>
-        <div class="col-md-4">
-          <div class="panel">
-            <h5 class="mb-2">Analytics</h5>
-            <div id="analyticsLoading" class="text-muted small">Loading analytics...</div>
-            <div id="analyticsOverview" style="display:none">
-              <ul class="list-group list-group-flush">
-                <li class="list-group-item bg-transparent text-white d-flex justify-content-between align-items-center">
-                  <span>Total Users</span><span id="analyticsTotalUsers">-</span>
-                </li>
-                <li class="list-group-item bg-transparent text-white d-flex justify-content-between align-items-center">
-                  <span>Active Users</span><span id="analyticsActiveUsers">-</span>
-                </li>
-                <li class="list-group-item bg-transparent text-white d-flex justify-content-between align-items-center">
-                  <span>Site Visits</span><span id="analyticsSiteVisits">-</span>
-                </li>
-                <li class="list-group-item bg-transparent text-white d-flex justify-content-between align-items-center">
-                  <span>Total Capstones</span><span id="analyticsTotalCapstones">-</span>
-                </li>
-                <li class="list-group-item bg-transparent text-white d-flex justify-content-between align-items-center">
-                  <span>Pending Capstones</span><span id="analyticsPendingCapstones">-</span>
-                </li>
-                <li class="list-group-item bg-transparent text-white d-flex justify-content-between align-items-center">
-                  <span>Approved Capstones</span><span id="analyticsApprovedCapstones">-</span>
-                </li>
-                <li class="list-group-item bg-transparent text-white d-flex justify-content-between align-items-center">
-                  <span>Rejected Capstones</span><span id="analyticsRejectedCapstones">-</span>
-                </li>
-                <li class="list-group-item bg-transparent text-white d-flex justify-content-between align-items-center">
-                  <span>Archived Capstones</span><span id="analyticsArchivedCapstones">-</span>
-                </li>
-                <li class="list-group-item bg-transparent text-white d-flex justify-content-between align-items-center">
-                  <span>File Views</span><span id="analyticsFileViews">-</span>
-                </li>
-                <li class="list-group-item bg-transparent text-white d-flex justify-content-between align-items-center">
-                  <span>File Downloads</span><span id="analyticsFileDownloads">-</span>
-                </li>
-              </ul>
-            </div>
-            <div id="analyticsError" class="text-danger small" style="display:none"></div>
-          </div>
-        </div>
 
-        <div class="col-md-4">
-          <div class="panel">
-            <h6>Users</h6>
-            <div class="mb-2">
-              <button id="refreshUsers" class="btn btn-sm btn-outline-light">Refresh users</button>
+        <!-- Users Section -->
+        <div id="usersSection" style="display:none">
+          <div class="admin-panel">
+            <div class="admin-panel-header">
+              <h3><i class="bi bi-people"></i> Manage Users</h3>
+              <button class="btn btn-outline-primary btn-sm" onclick="refreshUsers()">
+                <i class="bi bi-arrow-clockwise"></i> Refresh
+              </button>
             </div>
-            <div class="table-responsive">
-              <table class="table table-dark table-sm">
-                <thead><tr><th>Name</th><th>Role</th><th></th></tr></thead>
-                <tbody id="usersTbody"></tbody>
+            <div class="admin-panel-body">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Role</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="usersTbody">
+                  <tr><td colspan="5" class="text-center text-muted">Loading...</td></tr>
+                </tbody>
               </table>
             </div>
           </div>
         </div>
       </div>
+    </main>
+  </div>
 
-      <div id="adminMessages"></div>
+  <!-- Add/Edit Capstone Modal -->
+  <div class="modal fade" id="capstoneModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="capstoneModalTitle">Add Capstone</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div id="capstoneFormError" class="alert alert-danger" style="display:none"></div>
+          <form id="capstoneForm">
+            <input type="hidden" id="capstoneId">
+            <div class="row">
+              <div class="col-md-8">
+                <div class="form-group">
+                  <label>Title *</label>
+                  <input type="text" class="form-control" id="capTitle" required>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="form-group">
+                  <label>Year *</label>
+                  <input type="number" class="form-control" id="capYear" min="2000" max="2100" required>
+                </div>
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Abstract *</label>
+              <textarea class="form-control" id="capAbstract" rows="4" required></textarea>
+            </div>
+            <div class="row">
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label>Members (comma separated) *</label>
+                  <input type="text" class="form-control" id="capMembers" placeholder="John Doe, Jane Smith" required>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label>Adviser</label>
+                  <input type="text" class="form-control" id="capAdviser">
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label>Preview Image</label>
+                  <input type="file" class="form-control" id="capImage" accept="image/*">
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group">
+                  <label>PDF File</label>
+                  <input type="file" class="form-control" id="capPdf" accept=".pdf">
+                </div>
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Technologies (comma separated)</label>
+              <input type="text" class="form-control" id="capTech" placeholder="React, Node.js, MongoDB">
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-primary" onclick="saveCapstone()">
+            <i class="bi bi-save"></i> Save
+          </button>
+        </div>
+      </div>
     </div>
   </div>
 
-<script>
-  const BACKEND = 'http://localhost:4000/api';
-
-  function setMessage(msg, type='info'){
-    const el = document.getElementById('adminMessages');
-    el.innerHTML = `<div class="alert alert-${type} mt-2">${msg}</div>`;
-    setTimeout(()=>{ if (el) el.innerHTML = ''; }, 5000);
-  }
-
-  function getToken(){ return localStorage.getItem('accessToken'); }
-  function getUser(){ try { return JSON.parse(localStorage.getItem('user')); } catch(e){ return null; } }
-  // client-side state for capstones and current tab/status
-  let currentCapstones = [];
-  let currentStatus = 'pending';
-
-  function requireAdmin(){
-    const user = getUser();
-    const token = getToken();
-    if (!token || !user || !user.role || user.role.toLowerCase() !== 'admin'){
-      document.getElementById('notAuthorized').style.display = 'block';
-      document.getElementById('adminArea').style.display = 'none';
-      return false;
-    }
-    document.getElementById('notAuthorized').style.display = 'none';
-    document.getElementById('adminArea').style.display = 'block';
-    return true;
-  }
-
-  async function fetchCapstonesByStatus(status){
-    const token = getToken();
-    if (!token) return setMessage('No token available', 'warning');
-    try{
-      const res = await fetch(`${BACKEND}/admin/capstones/${status}`, { headers: { 'Authorization': `Bearer ${token}` } });
-      if (!res.ok) throw new Error('Failed to fetch capstones');
-      const body = await res.json();
-      console.log('[DEBUG] Capstone API response:', body); // <-- Debug log
-      const arr = body.data || [];
-      // store and populate year filter
-      currentCapstones = arr;
-      populateYearFilter(arr);
-      const selectedYear = document.getElementById('yearFilter')?.value || 'all';
-      const filtered = filterByYear(arr, selectedYear);
-      console.log('[DEBUG] Capstones after filter:', filtered); // <-- Debug log
-      renderCapstones(filtered, status);
-    }catch(err){ console.error(err); setMessage('Error fetching capstones', 'danger'); }
-  }
-
-  function filterByYear(arr, year){
-    if (!arr || !arr.length) return [];
-    if (!year || year === 'all') {
-      console.log('[DEBUG] filterByYear: returning all capstones', arr);
-      return arr;
-    }
-    const y = Number(year);
-    const filtered = arr.filter(c => Number(c.year) === y);
-    console.log(`[DEBUG] filterByYear: year=${year}, filtered=`, filtered);
-    return filtered;
-  }
-
-  function populateYearFilter(arr){
-    try{
-      const select = document.getElementById('yearFilter');
-      if (!select) return;
-      const years = Array.from(new Set(arr.map(c => c.year).filter(Boolean)));
-      console.log('[DEBUG] Years found for dropdown:', years, arr.map(c => c.year));
-      years.sort((a,b)=>b-a);
-      select.innerHTML = '<option value="all">All years</option>';
-      years.forEach(y=>{ const opt = document.createElement('option'); opt.value = y; opt.textContent = y; select.appendChild(opt); });
-    }catch(e){ console.error('populateYearFilter error', e); }
-  }
-
-  function renderCapstones(arr, status){
-    const tb = document.getElementById('capstoneTbody');
-    tb.innerHTML = '';
-    if (!arr.length) {
-        tb.innerHTML = `<tr><td colspan="2" class='muted-light'>No capstones for ${status}</td></tr>`;
-        return;
-    }
-      arr.forEach(c => {
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-          <td>
-            <strong>${c.title || ''}</strong><br>
-            <span class='text-secondary small'>Year: ${c.year || ''}</span><br>
-            <a href="${c.pdfUrl || '#'}" target="_blank" class="btn btn-sm btn-outline-light mt-1 view-pdf-btn" data-id="${c._id}" ${c.pdfUrl ? '' : 'disabled'}>View PDF</a>
-          </td>
-          <td>
-            <button class="btn btn-sm btn-success me-1" data-id="${c._id}" data-action="edit">Edit</button>
-            <button class="btn btn-sm btn-danger me-1" data-id="${c._id}" data-action="delete">Delete</button>
-            <button class="btn btn-sm btn-primary" data-id="${c._id}" data-action="update">Update</button>
-          </td>
-        `;
-        tb.appendChild(tr);
-      });
-      // Attach analytics logging for PDF views
-      tb.querySelectorAll('.view-pdf-btn').forEach(btn => btn.addEventListener('click', async e => {
-        const id = e.currentTarget.getAttribute('data-id');
-        const token = getToken();
-        if (id && token) {
-          try {
-            await fetch(`${BACKEND}/capstone/analytics/view/${id}`, { method: 'POST', headers: { 'Authorization': `Bearer ${token}` } });
-          } catch (err) { /* ignore */ }
-        }
-      }));
-    // Attach event listeners for action buttons
-    tb.querySelectorAll('button[data-action="edit"]').forEach(btn => btn.addEventListener('click', e => {
-      const id = e.currentTarget.getAttribute('data-id');
-      openEditCapstoneModal(id);
-    }));
-    tb.querySelectorAll('button[data-action="delete"]').forEach(btn => btn.addEventListener('click', e => {
-      const id = e.currentTarget.getAttribute('data-id');
-      if (confirm('Delete this capstone?')) deleteCapstone(id);
-    }));
-    tb.querySelectorAll('button[data-action="update"]').forEach(btn => btn.addEventListener('click', e => {
-      const id = e.currentTarget.getAttribute('data-id');
-      openEditCapstoneModal(id); // For now, update = edit
-    }));
-}
-
-  // Delete capstone
-  async function deleteCapstone(id){
-    const token = getToken(); if (!token) return setMessage('Not authenticated','warning');
-    try{
-      const res = await fetch(`${BACKEND}/capstone/delete/${id}`, { method: 'PATCH', headers: { 'Authorization': `Bearer ${token}` } });
-      const body = await res.json(); if(!res.ok) throw new Error(body.message||'Delete failed');
-      setMessage('Capstone deleted','success'); fetchCapstonesByStatus('pending');
-    }catch(e){ console.error(e); setMessage('Delete error','danger'); }
-  }
-
-  // Add capstone modal
-  function openAddCapstoneModal(){
-    const html = `
-    <div class="modal" tabindex="-1" id="addCapModal">
-      <div class="modal-dialog modal-lg modal-dialog-centered">
-        <div class="modal-content bg-dark text-white">
-          <div class="modal-header"><h5 class="modal-title">Add Capstone</h5><button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button></div>
-          <div class="modal-body">
-            <div id="addCapMsg"></div>
-            <div class="mb-2"><input id="capTitle" class="form-control" placeholder="Title"></div>
-            <div class="mb-2"><input id="capYear" class="form-control" placeholder="Year"></div>
-            <div class="mb-2"><input id="capAuthors" class="form-control" placeholder="Authors (comma separated)"></div>
-            <div class="mb-2"><textarea id="capDesc" class="form-control" placeholder="Short description"></textarea></div>
-            <div class="mb-2"><label class="form-label">PDF File</label><input id="capPdf" type="file" accept="application/pdf" class="form-control"></div>
-            <div class="mb-2"><label class="form-label">Preview Image (optional)</label><input id="capPreview" type="file" accept="image/*" class="form-control"></div>
+  <!-- Change Password Modal -->
+  <div class="modal fade" id="passwordModal" tabindex="-1">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Change Password</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div id="passwordError" class="alert alert-danger" style="display:none"></div>
+          <div id="passwordSuccess" class="alert alert-success" style="display:none"></div>
+          <div class="form-group">
+            <label>Current Password</label>
+            <input type="password" class="form-control" id="currentPassword">
           </div>
-          <div class="modal-footer"><button id="doAddCap" class="btn btn-success">Upload Capstone</button><button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button></div>
+          <div class="form-group">
+            <label>New Password</label>
+            <input type="password" class="form-control" id="newPassword">
+          </div>
+          <div class="form-group">
+            <label>Confirm New Password</label>
+            <input type="password" class="form-control" id="confirmPassword">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-primary" onclick="changePassword()">Update Password</button>
         </div>
       </div>
-    </div>`;
-    const wrapper = document.createElement('div'); wrapper.innerHTML = html; document.body.appendChild(wrapper);
-    const modalEl = document.getElementById('addCapModal'); const bsModal = new bootstrap.Modal(modalEl, {}); bsModal.show();
-    function setMsg(t, type='warning'){
-      const el = document.getElementById('addCapMsg');
-      if (el) el.innerHTML = `<div class="alert alert-${type}">${t}</div>`;
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    const BACKEND = 'http://localhost:5000/api';
+    let allCapstones = [];
+    let filteredCapstones = [];
+    let allUsers = [];
+
+    // Get token and user
+    function getToken() {
+      const token = localStorage.getItem('accessToken');
+      if (!token || token === 'undefined' || token === 'null') return null;
+      return token;
     }
-    document.getElementById('doAddCap').addEventListener('click', async ()=>{
-      setMsg('');
-      const title = document.getElementById('capTitle').value.trim();
-      const year = document.getElementById('capYear').value.trim();
-      const authors = document.getElementById('capAuthors').value.trim();
-      const desc = document.getElementById('capDesc').value.trim();
-      const pdfEl = document.getElementById('capPdf');
-      const previewEl = document.getElementById('capPreview');
-      if (!title || !desc || !year || !pdfEl.files.length || !previewEl.files.length) return setMsg('Title, description, year, PDF, and preview image are required','danger');
-      if (isNaN(Number(year)) || Number(year) < 1900 || Number(year) > new Date().getFullYear() + 1) {
-        setMsg('Please enter a valid year (e.g. 2023)','danger');
+    function getUser() { try { return JSON.parse(localStorage.getItem('user')); } catch(e) { return null; } }
+
+    // Check admin auth
+    function checkAdminAuth() {
+      const token = getToken();
+      const user = getUser();
+      
+      if (!token || !user || user.role !== 'Admin') {
+        // Clear bad/stale tokens so next login generates a clean one
+        localStorage.removeItem('accessToken');
+        document.getElementById('notAuthorized').style.display = 'block';
+        document.getElementById('adminContent').style.display = 'none';
+        return false;
+      }
+      
+      document.getElementById('notAuthorized').style.display = 'none';
+      document.getElementById('adminContent').style.display = 'block';
+      document.getElementById('adminName').textContent = user.fullName || 'Admin';
+      return true;
+    }
+
+    // Logout
+    function logout() {
+      localStorage.removeItem('accessToken');
+      localStorage.removeItem('user');
+      window.location.href = '/login.html';
+    }
+
+    // Show section
+    function showSection(section) {
+      // Hide all sections
+      document.getElementById('dashboardSection').style.display = 'none';
+      document.getElementById('capstonesSection').style.display = 'none';
+      document.getElementById('usersSection').style.display = 'none';
+      
+      // Update nav
+      document.querySelectorAll('.admin-nav a').forEach(a => a.classList.remove('active'));
+      event.target.classList.add('active');
+      
+      // Show selected section
+      const titles = {
+        'dashboard': '<i class="bi bi-speedometer2"></i> Dashboard',
+        'capstones': '<i class="bi bi-collection"></i> Capstones',
+        'users': '<i class="bi bi-people"></i> Users'
+      };
+      document.getElementById('sectionTitle').innerHTML = titles[section] || 'Dashboard';
+      document.getElementById(section + 'Section').style.display = 'block';
+      
+      // Load data
+      if (section === 'capstones') loadCapstones();
+      if (section === 'users') loadUsers();
+    }
+
+    // Load dashboard data
+    async function loadDashboard() {
+      const token = getToken();
+      if (!token) return;
+      
+      try {
+        // Load capstones for stats
+        const capstonesRes = await fetch(`${BACKEND}/admin/capstones/all`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (capstonesRes.ok) {
+          const data = await capstonesRes.json();
+          allCapstones = data.data || [];
+          
+          document.getElementById('statTotalProjects').textContent = allCapstones.length;
+          document.getElementById('statApproved').textContent = allCapstones.filter(c => c.status === 'approved').length;
+          document.getElementById('statPending').textContent = allCapstones.filter(c => c.status === 'pending').length;
+          
+          // Render recent capstones
+          const recent = allCapstones.slice(0, 5);
+          document.getElementById('recentCapstones').innerHTML = recent.length ? recent.map(c => `
+            <tr>
+              <td>${c.title || 'Untitled'}</td>
+              <td>${c.year || 'N/A'}</td>
+              <td><span class="status-badge ${c.status}">${c.status || 'pending'}</span></td>
+              <td>${c.createdAt ? new Date(c.createdAt).toLocaleDateString() : 'N/A'}</td>
+            </tr>
+          `).join('') : '<tr><td colspan="4" class="text-center text-muted">No capstones yet</td></tr>';
+        }
+        
+        // Load users count
+        const usersRes = await fetch(`${BACKEND}/admin/all`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (usersRes.ok) {
+          const data = await usersRes.json();
+          document.getElementById('statUsers').textContent = (data.data || data.users || []).length;
+        }
+        
+        // Load analytics
+        const analyticsRes = await fetch(`${BACKEND}/admin/analytics/overview`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (analyticsRes.ok) {
+          const data = await analyticsRes.json();
+          document.getElementById('analyticsViews').textContent = data.fileViews || 0;
+          document.getElementById('analyticsDownloads').textContent = data.fileDownloads || 0;
+          document.getElementById('analyticsSiteVisits').textContent = data.siteVisits || 0;
+          document.getElementById('analyticsActiveUsers').textContent = data.activeUsers || 0;
+        }
+      } catch (err) {
+        console.error('Error loading dashboard:', err);
+      }
+    }
+
+    // Load capstones
+    async function loadCapstones() {
+      const token = getToken();
+      if (!token) return;
+      
+      try {
+        const res = await fetch(`${BACKEND}/admin/capstones/all`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (res.ok) {
+          const data = await res.json();
+          allCapstones = data.data || [];
+          
+          // Populate year filter
+          const years = [...new Set(allCapstones.map(c => c.year))].filter(Boolean).sort((a, b) => b - a);
+          const yearFilter = document.getElementById('yearFilter');
+          yearFilter.innerHTML = '<option value="all">All Years</option>' + 
+            years.map(y => `<option value="${y}">${y}</option>`).join('');
+          
+          applyCapstoneFilters();
+        }
+      } catch (err) {
+        console.error('Error loading capstones:', err);
+      }
+    }
+
+    // Apply all capstone filters
+    function applyCapstoneFilters() {
+      const year = document.getElementById('yearFilter').value;
+      const search = document.getElementById('capstoneSearch').value.toLowerCase();
+      
+      filteredCapstones = allCapstones.filter(c => {
+        if (year !== 'all' && c.year != year) return false;
+        if (search) {
+          const title = (c.title || '').toLowerCase();
+          const members = (c.members || []).join(' ').toLowerCase();
+          if (!title.includes(search) && !members.includes(search)) return false;
+        }
+        return true;
+      });
+      
+      renderCapstones();
+    }
+
+    // Render capstones table
+    function renderCapstones() {
+      const tbody = document.getElementById('capstoneTbody');
+      
+      if (filteredCapstones.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="4" class="text-center text-muted">No capstones found</td></tr>';
         return;
       }
-      console.log('[DEBUG] Uploading capstone with year:', year);
-      // Backend expects 'abstract', 'members' (array), and 'previewImage'
-      const form = new FormData();
-      form.append('title', title);
-      form.append('abstract', desc);
-      form.append('year', year);
-      // Authors to members array
-      const membersArr = authors.split(',').map(a => a.trim()).filter(a => a);
-      form.append('members', JSON.stringify(membersArr));
-      form.append('pdfFile', pdfEl.files[0]);
-      form.append('previewImage', previewEl.files[0]);
-      const token = getToken(); if (!token) return setMsg('Not authenticated','danger');
-      try{
-        const res = await fetch(`${BACKEND}/capstone`, { method:'POST', headers: { 'Authorization': `Bearer ${token}` }, body: form });
-        const body = await res.json(); if (!res.ok) return setMsg(body.message||'Upload failed','danger');
-        setMsg('Capstone uploaded','success'); setTimeout(()=>{ bsModal.hide(); fetchCapstonesByStatus('pending'); }, 900);
-      }catch(e){ console.error(e); setMsg('Network error','danger'); }
-    });
-    modalEl.addEventListener('hidden.bs.modal', ()=>{ try{ wrapper.remove(); }catch(e){} });
-  }
-
-  document.getElementById('btnAddCapstone').addEventListener('click', ()=>{ openAddCapstoneModal(); });
-
-  // Edit capstone (attempt PUT)
-  async function openEditCapstoneModal(id){
-    // fetch capstone data
-    try{
-      const token = getToken(); if (!token) return setMessage('Not authenticated','warning');
-      const res = await fetch(`${BACKEND}/capstone/${id}`, { headers: { 'Authorization': `Bearer ${token}` } });
-      if (!res.ok) throw new Error('Failed to fetch capstone');
-      const body = await res.json(); const c = body.data || body;
-      const html = `
-      <div class="modal" tabindex="-1" id="editCapModal">
-        <div class="modal-dialog modal-lg modal-dialog-centered">
-          <div class="modal-content bg-dark text-white">
-            <div class="modal-header"><h5 class="modal-title">Edit Capstone</h5><button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button></div>
-            <div class="modal-body">
-              <div id="editCapMsg"></div>
-              <div class="mb-2"><input id="editCapTitle" class="form-control" placeholder="Title" value="${escapeHtml(c.title||'')}"></div>
-              <div class="mb-2"><input id="editCapYear" class="form-control" placeholder="Year" value="${escapeHtml(c.year||'')}"></div>
-              <div class="mb-2"><input id="editCapAuthors" class="form-control" placeholder="Authors" value="${escapeHtml((c.members||c.authors||'').toString())}"></div>
-              <div class="mb-2"><textarea id="editCapDesc" class="form-control" placeholder="Short description">${escapeHtml(c.description||'')}</textarea></div>
-              <div class="mb-2"><label class="form-label">Replace PDF (optional)</label><input id="editCapPdf" type="file" accept="application/pdf" class="form-control"></div>
-              <div class="mb-2"><label class="form-label">Replace Preview Image (optional)</label><input id="editCapPreview" type="file" accept="image/*" class="form-control"></div>
+      
+      tbody.innerHTML = filteredCapstones.map(c => `
+        <tr>
+          <td><strong>${c.title || 'Untitled'}</strong></td>
+          <td>${(c.members || []).slice(0, 2).join(', ')}${c.members?.length > 2 ? '...' : ''}</td>
+          <td>${c.year || 'N/A'}</td>
+          <td>
+            <div class="d-flex gap-1">
+              <button class="btn btn-outline-primary btn-sm" onclick="editCapstone('${c._id}')" title="Edit">
+                <i class="bi bi-pencil"></i>
+              </button>
+              <button class="btn btn-outline-danger btn-sm" onclick="deleteCapstone('${c._id}')" title="Delete">
+                <i class="bi bi-trash"></i>
+              </button>
             </div>
-            <div class="modal-footer"><button id="doEditCap" class="btn btn-success">Save changes</button><button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button></div>
-          </div>
-        </div>
-      </div>`;
-      const wrapper = document.createElement('div'); wrapper.innerHTML = html; document.body.appendChild(wrapper);
-      const modalEl = document.getElementById('editCapModal'); const bsModal = new bootstrap.Modal(modalEl, {}); bsModal.show();
-      function setMsg(t,type='warning'){ document.getElementById('editCapMsg').innerHTML = `<div class="alert alert-${type}">${t}</div>`; }
-      document.getElementById('doEditCap').addEventListener('click', async ()=>{
-        setMsg(''); const title = document.getElementById('editCapTitle').value.trim(); const year = document.getElementById('editCapYear').value.trim(); const authors = document.getElementById('editCapAuthors').value.trim(); const desc = document.getElementById('editCapDesc').value.trim(); const pdfEl = document.getElementById('editCapPdf'); const previewEl = document.getElementById('editCapPreview');
-        const form = new FormData(); form.append('title', title); form.append('year', year); form.append('authors', authors); form.append('description', desc);
-        if (pdfEl.files.length) form.append('pdfFile', pdfEl.files[0]); if (previewEl.files.length) form.append('previewImage', previewEl.files[0]);
-        try{
-          const token = getToken(); if (!token) return setMsg('Not authenticated','danger');
-          const res = await fetch(`${BACKEND}/capstone/${id}`, { method: 'PUT', headers: { 'Authorization': `Bearer ${token}` }, body: form });
-          const body = await res.json(); if (!res.ok) return setMsg(body.message||'Update failed','danger');
-          setMsg('Capstone updated','success'); setTimeout(()=>{ bsModal.hide(); fetchCapstonesByStatus('pending'); }, 900);
-        }catch(e){ console.error(e); setMsg('Network error','danger'); }
-      });
-      modalEl.addEventListener('hidden.bs.modal', ()=>{ try{ wrapper.remove(); }catch(e){} });
-    }catch(e){ console.error(e); setMessage('Failed to load capstone for edit','danger'); }
-  }
-
-  async function approveCapstone(id){
-    const token = getToken(); if (!token) return setMessage('Not authenticated', 'warning');
-    try{
-      const res = await fetch(`${BACKEND}/admin/capstone/approve/${id}`, { method:'PATCH', headers:{ 'Authorization': `Bearer ${token}` } });
-      const body = await res.json();
-      if (!res.ok) throw new Error(body.message || 'Approve failed');
-      setMessage('Capstone approved', 'success');
-      fetchCapstonesByStatus('pending');
-    }catch(err){ console.error(err); setMessage('Approve error', 'danger'); }
-  }
-
-  async function rejectCapstone(id){
-    const token = getToken(); if (!token) return setMessage('Not authenticated', 'warning');
-    try{
-      const res = await fetch(`${BACKEND}/admin/capstone/reject/${id}`, { method:'PATCH', headers:{ 'Authorization': `Bearer ${token}` } });
-      const body = await res.json();
-      if (!res.ok) throw new Error(body.message || 'Reject failed');
-      setMessage('Capstone rejected', 'success');
-      fetchCapstonesByStatus('pending');
-    }catch(err){ console.error(err); setMessage('Reject error', 'danger'); }
-  }
-
-  // Users
-  async function fetchUsers(){
-    const token = getToken(); if (!token) return setMessage('Not authenticated', 'warning');
-    try{
-      const res = await fetch(`${BACKEND}/admin/all`, { headers:{ 'Authorization': `Bearer ${token}` } });
-      if (!res.ok) throw new Error('Failed to fetch users');
-      const body = await res.json();
-      const users = body.data || [];
-      renderUsers(users);
-    }catch(err){ console.error(err); setMessage('Users fetch error', 'danger'); }
-  }
-
-  function renderUsers(users){
-    const tb = document.getElementById('usersTbody'); tb.innerHTML = '';
-    if (!users.length) { tb.innerHTML = `<tr><td colspan="3" class="muted-light">No users</td></tr>`; return; }
-    users.forEach(u => {
-      const tr = document.createElement('tr');
-      tr.innerHTML = `<td>${escapeHtml(u.fullName||u.email||'')}</td><td>${escapeHtml(u.role||'')}</td><td>${u.isDisabled? `<button data-id="${u._id}" class="btn btn-sm btn-success btn-enable">Enable</button>` : `<button data-id="${u._id}" class="btn btn-sm btn-danger btn-disable">Disable</button>`}</td>`;
-      tb.appendChild(tr);
-    });
-    document.querySelectorAll('.btn-disable').forEach(b=>b.addEventListener('click', async (e)=>{ const id=e.currentTarget.getAttribute('data-id'); await disableUser(id); }));
-    document.querySelectorAll('.btn-enable').forEach(b=>b.addEventListener('click', async (e)=>{ const id=e.currentTarget.getAttribute('data-id'); await enableUser(id); }));
-  }
-
-  async function disableUser(id){ const token=getToken(); try{ const res=await fetch(`${BACKEND}/admin/user/disable/${id}`,{ method:'PATCH', headers:{ 'Authorization': `Bearer ${token}` } }); const body=await res.json(); if(!res.ok) throw new Error(body.message||'Disable failed'); setMessage('User disabled','success'); fetchUsers(); }catch(e){ console.error(e); setMessage('Disable error','danger'); } }
-  async function enableUser(id){ const token=getToken(); try{ const res=await fetch(`${BACKEND}/admin/user/enable/${id}`,{ method:'PATCH', headers:{ 'Authorization': `Bearer ${token}` } }); const body=await res.json(); if(!res.ok) throw new Error(body.message||'Enable failed'); setMessage('User enabled','success'); fetchUsers(); }catch(e){ console.error(e); setMessage('Enable error','danger'); } }
-
-  function escapeHtml(s){ if(!s) return ''; return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
-
-  // UI wiring
-  // Removed status tab event listeners (no such elements)
-  document.getElementById('refreshUsers').addEventListener('click', fetchUsers);
-
-  // year filter change: re-render from currentCapstones
-  const yearFilterEl = document.getElementById('yearFilter');
-  if (yearFilterEl) yearFilterEl.addEventListener('change', ()=>{
-    const sel = yearFilterEl.value || 'all';
-    const filtered = filterByYear(currentCapstones, sel);
-    renderCapstones(filtered, currentStatus);
-  });
-
-  function setActiveTab(name){
-    currentStatus = name;
-    fetchCapstonesByStatus(name);
-  }
-  function capitalize(s){ return s.charAt(0).toUpperCase()+s.slice(1); }
-
-  document.getElementById('adminLogout').addEventListener('click', ()=>{ localStorage.removeItem('accessToken'); localStorage.removeItem('user'); window.location.href = '/'; });
-
-  // Change password modal wiring
-  function openChangePasswordModal(){
-    const html = `
-    <div class="modal" tabindex="-1" id="changePwdModal">
-      <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content bg-dark text-white">
-          <div class="modal-header">
-            <h5 class="modal-title">Change Password</h5>
-            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-          </div>
-          <div class="modal-body">
-            <div id="pwdMsg"></div>
-            <div class="mb-2"><input id="currentPwd" type="password" class="form-control" placeholder="Current password"></div>
-            <div class="mb-2"><input id="newPwd" type="password" class="form-control" placeholder="New password (min 6 chars)"></div>
-            <div class="mb-2"><input id="confirmNewPwd" type="password" class="form-control" placeholder="Confirm new password"></div>
-          </div>
-          <div class="modal-footer">
-            <button id="doChangePwd" class="btn btn-success">Change password</button>
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-          </div>
-        </div>
-      </div>
-    </div>`;
-    const wrapper = document.createElement('div'); wrapper.innerHTML = html; document.body.appendChild(wrapper);
-    const modalEl = document.getElementById('changePwdModal');
-    const bsModal = new bootstrap.Modal(modalEl, {});
-    bsModal.show();
-
-    function setPwdMsg(text, type='warning'){
-      const el = document.getElementById('pwdMsg'); el.innerHTML = `<div class="alert alert-${type}">${text}</div>`;
+          </td>
+        </tr>
+      `).join('');
     }
 
-    document.getElementById('doChangePwd').addEventListener('click', async ()=>{
-      setPwdMsg('');
-      const currentPassword = document.getElementById('currentPwd').value;
-      const newPassword = document.getElementById('newPwd').value;
-      const confirm = document.getElementById('confirmNewPwd').value;
-      if (!currentPassword || !newPassword) return setPwdMsg('Please fill both fields','danger');
-      if (newPassword !== confirm) return setPwdMsg('New passwords do not match','danger');
-      if (newPassword.length < 6) return setPwdMsg('New password must be at least 6 characters','danger');
-      const token = localStorage.getItem('accessToken');
-      try{
-        const res = await fetch(`${BACKEND}/user/me/password`, { method: 'PATCH', headers: { 'Content-Type':'application/json', 'Authorization': `Bearer ${token}` }, body: JSON.stringify({ currentPassword, newPassword }) });
-        const body = await res.json();
-        if (!res.ok) return setPwdMsg(body.message || 'Failed to change password','danger');
-        setPwdMsg('Password changed successfully. Please log in again.', 'success');
-        // Clear token and user after short delay and redirect to login
-        setTimeout(()=>{ localStorage.removeItem('accessToken'); localStorage.removeItem('user'); window.location.href = '/'; }, 1500);
-      }catch(e){ console.error(e); setPwdMsg('Network error','danger'); }
-    });
-
-    // remove modal from DOM when hidden
-    modalEl.addEventListener('hidden.bs.modal', ()=>{ try{ wrapper.remove(); }catch(e){}});
-  }
-
-  document.getElementById('openChangePassword').addEventListener('click', ()=>{ openChangePasswordModal(); });
-
-  // init
-  (function init(){ if (!requireAdmin()) return; setActiveTab('pending'); fetchUsers(); })();
-  // --- Analytics Section ---
-  async function fetchAnalyticsOverview() {
-    const token = getToken();
-    const loadingEl = document.getElementById('analyticsLoading');
-    const overviewEl = document.getElementById('analyticsOverview');
-    const errorEl = document.getElementById('analyticsError');
-    if (!token) {
-      loadingEl.style.display = 'none';
-      overviewEl.style.display = 'none';
-      errorEl.style.display = 'block';
-      errorEl.textContent = 'Not authenticated';
-      return;
+    // Approve capstone
+    async function approveCapstone(id) {
+      const token = getToken();
+      try {
+        const res = await fetch(`${BACKEND}/admin/capstone/approve/${id}`, {
+          method: 'PATCH',
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (res.ok) {
+          loadCapstones();
+          loadDashboard();
+        }
+      } catch (err) {
+        console.error('Error approving capstone:', err);
+      }
     }
-    loadingEl.style.display = 'block';
-    overviewEl.style.display = 'none';
-    errorEl.style.display = 'none';
-    try {
-      const res = await fetch(`${BACKEND}/admin/analytics/overview`, {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
-      const body = await res.json();
-      if (!res.ok) throw new Error(body.message || 'Failed to fetch analytics');
-      const d = body.data || {};
-      document.getElementById('analyticsTotalUsers').textContent = d.users?.total ?? '-';
-      document.getElementById('analyticsActiveUsers').textContent = d.users?.active ?? '-';
-      document.getElementById('analyticsSiteVisits').textContent = d.users?.visits ?? '-';
-      document.getElementById('analyticsTotalCapstones').textContent = d.capstones?.total ?? '-';
-      document.getElementById('analyticsPendingCapstones').textContent = d.capstones?.pending ?? '-';
-      document.getElementById('analyticsApprovedCapstones').textContent = d.capstones?.approved ?? '-';
-      document.getElementById('analyticsRejectedCapstones').textContent = d.capstones?.rejected ?? '-';
-      document.getElementById('analyticsArchivedCapstones').textContent = d.capstones?.archived ?? '-';
-      document.getElementById('analyticsFileViews').textContent = d.capstones?.views ?? '-';
-      document.getElementById('analyticsFileDownloads').textContent = d.capstones?.downloads ?? '-';
-      loadingEl.style.display = 'none';
-      overviewEl.style.display = 'block';
-    } catch (e) {
-      loadingEl.style.display = 'none';
-      overviewEl.style.display = 'none';
-      errorEl.style.display = 'block';
-      errorEl.textContent = 'Error loading analytics';
-      console.error(e);
-    }
-  }
 
-  // Fetch analytics on page load
-  fetchAnalyticsOverview();
-</script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    // Reject capstone
+    async function rejectCapstone(id) {
+      const token = getToken();
+      try {
+        const res = await fetch(`${BACKEND}/admin/capstone/reject/${id}`, {
+          method: 'PATCH',
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (res.ok) {
+          loadCapstones();
+          loadDashboard();
+        }
+      } catch (err) {
+        console.error('Error rejecting capstone:', err);
+      }
+    }
+
+    // Delete capstone
+    async function deleteCapstone(id) {
+      if (!confirm('Are you sure you want to delete this capstone?')) return;
+      
+      const token = getToken();
+      try {
+        const res = await fetch(`${BACKEND}/capstone/delete/${id}`, {
+          method: 'PATCH',
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (res.ok) {
+          loadCapstones();
+          loadDashboard();
+        }
+      } catch (err) {
+        console.error('Error deleting capstone:', err);
+      }
+    }
+
+    // Open add capstone modal
+    function openAddCapstone() {
+      document.getElementById('capstoneModalTitle').textContent = 'Add Capstone';
+      document.getElementById('capstoneForm').reset();
+      document.getElementById('capstoneId').value = '';
+      document.getElementById('capstoneFormError').style.display = 'none';
+      document.getElementById('capYear').value = new Date().getFullYear();
+      new bootstrap.Modal(document.getElementById('capstoneModal')).show();
+    }
+
+    // Edit capstone
+    async function editCapstone(id) {
+      const capstone = allCapstones.find(c => c._id === id);
+      if (!capstone) return;
+      
+      document.getElementById('capstoneModalTitle').textContent = 'Edit Capstone';
+      document.getElementById('capstoneId').value = id;
+      document.getElementById('capTitle').value = capstone.title || '';
+      document.getElementById('capYear').value = capstone.year || '';
+      document.getElementById('capAbstract').value = capstone.abstract || '';
+      document.getElementById('capMembers').value = (capstone.members || []).join(', ');
+      document.getElementById('capAdviser').value = capstone.adviser || '';
+      document.getElementById('capTech').value = (capstone.technologies || []).join(', ');
+      document.getElementById('capstoneFormError').style.display = 'none';
+      
+      // Show current file info if they exist
+      const previewFileLabel = document.querySelector('label[for="capImage"]');
+      const pdfFileLabel = document.querySelector('label[for="capPdf"]');
+      
+      if (previewFileLabel && capstone.previewImage?.url) {
+        previewFileLabel.textContent = '📄 Preview Image (Current: exists)';
+      } else if (previewFileLabel) {
+        previewFileLabel.textContent = 'Preview Image';
+      }
+      
+      if (pdfFileLabel && capstone.pdfUrl) {
+        pdfFileLabel.textContent = '📑 PDF File (Current: exists)';
+      } else if (pdfFileLabel) {
+        pdfFileLabel.textContent = 'PDF File';
+      }
+      
+      new bootstrap.Modal(document.getElementById('capstoneModal')).show();
+    }
+
+    // Save capstone
+    async function saveCapstone() {
+      const token = getToken();
+      const id = document.getElementById('capstoneId').value;
+      
+      const formData = new FormData();
+      formData.append('title', document.getElementById('capTitle').value);
+      formData.append('year', document.getElementById('capYear').value);
+      formData.append('abstract', document.getElementById('capAbstract').value);
+      formData.append('members', document.getElementById('capMembers').value);
+      formData.append('adviser', document.getElementById('capAdviser').value);
+      formData.append('technologies', document.getElementById('capTech').value);
+      
+      const imageFile = document.getElementById('capImage').files[0];
+      const pdfFile = document.getElementById('capPdf').files[0];
+      if (imageFile) formData.append('previewImage', imageFile);
+      if (pdfFile) formData.append('pdf', pdfFile);
+      
+      try {
+        const url = id ? `${BACKEND}/capstone/${id}` : `${BACKEND}/capstone`;
+        const method = id ? 'PUT' : 'POST';
+        
+        const res = await fetch(url, {
+          method,
+          headers: { 'Authorization': `Bearer ${token}` },
+          body: formData
+        });
+        
+        if (res.ok) {
+          bootstrap.Modal.getInstance(document.getElementById('capstoneModal')).hide();
+          loadCapstones();
+          loadDashboard();
+        } else {
+          const data = await res.json();
+          document.getElementById('capstoneFormError').textContent = data.message || 'Error saving capstone';
+          document.getElementById('capstoneFormError').style.display = 'block';
+        }
+      } catch (err) {
+        document.getElementById('capstoneFormError').textContent = 'Network error. Please try again.';
+        document.getElementById('capstoneFormError').style.display = 'block';
+      }
+    }
+
+    // Load users
+    async function loadUsers() {
+      const token = getToken();
+      if (!token) return;
+      
+      try {
+        const res = await fetch(`${BACKEND}/admin/all`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (res.ok) {
+          const data = await res.json();
+          allUsers = data.users || [];
+          renderUsers();
+        }
+      } catch (err) {
+        console.error('Error loading users:', err);
+      }
+    }
+
+    function refreshUsers() {
+      loadUsers();
+    }
+
+    // Render users table
+    function renderUsers() {
+      const tbody = document.getElementById('usersTbody');
+      
+      if (allUsers.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted">No users found</td></tr>';
+        return;
+      }
+      
+      tbody.innerHTML = allUsers.map(u => `
+        <tr>
+          <td><strong>${u.fullName || 'Unknown'}</strong></td>
+          <td>${u.email || 'N/A'}</td>
+          <td><span class="status-badge ${u.role === 'Admin' ? 'approved' : 'pending'}">${u.role || 'Viewer'}</span></td>
+          <td><span class="status-badge ${u.isDisabled ? 'rejected' : 'approved'}">${u.isDisabled ? 'Disabled' : 'Active'}</span></td>
+          <td>
+            <div class="d-flex gap-1">
+              ${u.role !== 'Admin' ? `
+                <button class="btn btn-outline-primary btn-sm" onclick="promoteUser('${u._id}')" title="Make Admin">
+                  <i class="bi bi-arrow-up"></i>
+                </button>
+              ` : ''}
+              <button class="btn btn-outline-${u.isDisabled ? 'success' : 'warning'} btn-sm" onclick="toggleUser('${u._id}', ${!u.isDisabled})" title="${u.isDisabled ? 'Enable' : 'Disable'}">
+                <i class="bi bi-${u.isDisabled ? 'check' : 'slash'}-circle"></i>
+              </button>
+            </div>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    // Promote user to admin
+    async function promoteUser(id) {
+      if (!confirm('Make this user an admin?')) return;
+      
+      const token = getToken();
+      try {
+        const res = await fetch(`${BACKEND}/admin/user/${id}/role`, {
+          method: 'PATCH',
+          headers: { 
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ role: 'Admin' })
+        });
+        if (res.ok) loadUsers();
+      } catch (err) {
+        console.error('Error promoting user:', err);
+      }
+    }
+
+    // Toggle user status
+    async function toggleUser(id, disable) {
+      const token = getToken();
+      try {
+        const res = await fetch(`${BACKEND}/admin/user/${id}/status`, {
+          method: 'PATCH',
+          headers: { 
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ isDisabled: disable })
+        });
+        if (res.ok) loadUsers();
+      } catch (err) {
+        console.error('Error toggling user:', err);
+      }
+    }
+
+    // Change password
+    function openChangePassword() {
+      document.getElementById('currentPassword').value = '';
+      document.getElementById('newPassword').value = '';
+      document.getElementById('confirmPassword').value = '';
+      document.getElementById('passwordError').style.display = 'none';
+      document.getElementById('passwordSuccess').style.display = 'none';
+      new bootstrap.Modal(document.getElementById('passwordModal')).show();
+    }
+
+    async function changePassword() {
+      const current = document.getElementById('currentPassword').value;
+      const newPass = document.getElementById('newPassword').value;
+      const confirm = document.getElementById('confirmPassword').value;
+      
+      if (!current || !newPass || !confirm) {
+        document.getElementById('passwordError').textContent = 'All fields are required';
+        document.getElementById('passwordError').style.display = 'block';
+        return;
+      }
+      
+      if (newPass !== confirm) {
+        document.getElementById('passwordError').textContent = 'Passwords do not match';
+        document.getElementById('passwordError').style.display = 'block';
+        return;
+      }
+      
+      const token = getToken();
+      try {
+        const res = await fetch(`${BACKEND}/user/change-password`, {
+          method: 'PATCH',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ currentPassword: current, newPassword: newPass })
+        });
+        
+        if (res.ok) {
+          document.getElementById('passwordSuccess').textContent = 'Password changed successfully!';
+          document.getElementById('passwordSuccess').style.display = 'block';
+          document.getElementById('passwordError').style.display = 'none';
+          setTimeout(() => {
+            bootstrap.Modal.getInstance(document.getElementById('passwordModal')).hide();
+          }, 1500);
+        } else {
+          const data = await res.json();
+          document.getElementById('passwordError').textContent = data.message || 'Error changing password';
+          document.getElementById('passwordError').style.display = 'block';
+        }
+      } catch (err) {
+        document.getElementById('passwordError').textContent = 'Network error. Please try again.';
+        document.getElementById('passwordError').style.display = 'block';
+      }
+    }
+
+    // Initialize
+    if (checkAdminAuth()) {
+      loadDashboard();
+    }
+  </script>
 </body>
 </html>

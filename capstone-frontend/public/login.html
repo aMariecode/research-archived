@@ -3,180 +3,262 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>WELCOME — BATCHELOR OF INFORMATION TECHNOLOGY — UA RESEARCH ARCHIVED</title>
+  <title>Welcome — UA Research Archive</title>
   <link rel="stylesheet" href="style.css">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-  <style>
-    .logo-placeholder{width:120px;height:120px;border:3px dashed rgba(255,255,255,0.4);display:flex;align-items:center;justify-content:center;color:#fff;margin:auto}
-    .hero {min-height: 100vh;display:flex;align-items:center}
-    .brand-title {color:#fff;letter-spacing:0.06em}
-    .card {border-radius:12px}
-    .input-error {color:#c62828;font-size:0.9rem}
-    /* Login and Registration tab styling (restyled to non-white theme) */
-    .card.custom-auth { background: linear-gradient(180deg,#083f3e 0%, #0f6b68 100%); color: #fff; padding: 1rem; }
-    .card.custom-auth .tab-pane { padding: 0.5rem; }
-    .card.custom-auth .form-control { background: rgba(255,255,255,0.06); color: #fff; border: 1px solid rgba(255,255,255,0.08); }
-    .card.custom-auth .form-control::placeholder { color: rgba(255,255,255,0.7); }
-    .card.custom-auth .btn-primary { background-color: #0d9b94; border-color: #0d9b94; }
-    .card.custom-auth .btn-success { background-color: #0aa58f; border-color: #0aa58f; }
-    .auth-or { display:flex; align-items:center; gap:0.6rem; color:rgba(255,255,255,0.8); }
-    .auth-or hr { flex:1; border-color: rgba(255,255,255,0.08); }
-  </style>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
 </head>
 <body>
-  <div class="container-fluid hero" style="background: linear-gradient(135deg,#0f4c4b 0%, #1b6b6a 40%, #4fb6ad 100%);">
-    <div class="container">
-      <div class="row align-items-center">
-        <div class="col-12 col-md-6 text-center text-md-start mb-4 mb-md-0">
-          <div class="logo-placeholder mb-3">
-            <!-- put logo image here -->
-            <div style="font-size:12px;text-align:center">LOGO<br>SPACE</div>
-          </div>
-          <h1 class="brand-title display-6">WELCOME</h1>
-          <h3 class="brand-title">BATCHELOR OF INFORMATION TECHNOLOGY</h3>
-          <p class="brand-title small">UA RESEARCH ARCHIVED</p>
-          <p class="text-white-50 mt-3">Access the Capstone Library kiosk by logging in or registering an account. Admin actions are restricted to admin users.</p>
+  <div class="auth-page">
+    <!-- Left Side - Branding -->
+    <div class="auth-left">
+      <div class="auth-logo">
+        <img src="ua-seal.png" alt="University of the Assumption" class="auth-logo-image">
+        <div>
+          <h1 style="font-size: 2rem; margin: 0; font-weight: 700;">University of the Assumption</h1>
+          <span style="opacity: 0.85; font-size: 0.9rem;">College of Information Technology</span>
         </div>
-
-        <div class="col-12 col-md-6">
-          <div class="card p-3 shadow-sm custom-auth">
-            <ul class="nav nav-tabs mb-3" id="authTabs" role="tablist">
-              <li class="nav-item" role="presentation">
-                <button class="nav-link active" id="login-tab" data-bs-toggle="tab" data-bs-target="#login" type="button" role="tab">Login</button>
-              </li>
-              <li class="nav-item" role="presentation">
-                <button class="nav-link" id="register-tab" data-bs-toggle="tab" data-bs-target="#register" type="button" role="tab">Register</button>
-              </li>
-            </ul>
-
-            <div class="tab-content">
-              <div class="tab-pane fade show active" id="login" role="tabpanel" aria-labelledby="login-tab">
-                <div id="loginError" class="input-error mb-2" style="display:none"></div>
-                <div class="mb-2"><input id="pageLoginEmail" class="form-control" placeholder="Email"></div>
-                <div class="mb-2"><input id="pageLoginPassword" type="password" class="form-control" placeholder="Password"></div>
-                <div class="d-grid">
-                  <button id="pageDoLogin" class="btn btn-primary">Login</button>
-                </div>
-                <div class="my-3 text-center">
-                  <div class="auth-or"><hr><div>or</div><hr></div>
-                  <div id="g_id_on_page" class="d-flex justify-content-center mt-2"></div>
-                  <div class="small mt-2" style="color:rgba(255,255,255,0.8)">Sign in with your Gmail account (Google)</div>
-                </div>
-              </div>
-
-              <div class="tab-pane fade" id="register" role="tabpanel" aria-labelledby="register-tab">
-                <div id="regError" class="input-error mb-2" style="display:none"></div>
-                <div class="mb-2"><input id="pageRegName" class="form-control" placeholder="Full name"></div>
-                <div class="mb-2"><input id="pageRegEmail" class="form-control" placeholder="Email"></div>
-                <div class="mb-2"><input id="pageRegSchool" class="form-control" placeholder="Name of School"></div>
-                <div class="mb-2"><input id="pageRegPassword" type="password" class="form-control" placeholder="Password"></div>
-                <div class="d-grid">
-                  <button id="pageDoRegister" class="btn btn-success">Register</button>
-                </div>
-              </div>
-            </div>
-
-            <div class="text-center mt-3 small text-muted">After successful login you'll be redirected to the kiosk.</div>
+      </div>
+      
+      <h1>Welcome to UA<br>Capstone Library</h1>
+      <p>Access and explore innovative capstone projects created by IT students. Browse research papers, view abstracts, and download project documentation.</p>
+      
+      <div class="auth-features">
+        <div class="auth-feature">
+          <div class="auth-feature-icon">
+            <i class="bi bi-search"></i>
+          </div>
+          <div>
+            <h4>Search & Discover</h4>
+            <p>Find projects by title, author, year, or keywords</p>
+          </div>
+        </div>
+        <div class="auth-feature">
+          <div class="auth-feature-icon">
+            <i class="bi bi-file-earmark-pdf"></i>
+          </div>
+          <div>
+            <h4>View & Download</h4>
+            <p>Access full documentation and research papers</p>
+          </div>
+        </div>
+        <div class="auth-feature">
+          <div class="auth-feature-icon">
+            <i class="bi bi-bookmark-star"></i>
+          </div>
+          <div>
+            <h4>Curated Collection</h4>
+            <p>Browse approved capstone projects from all batches</p>
           </div>
         </div>
       </div>
     </div>
+    
+    <!-- Right Side - Auth Form -->
+    <div class="auth-right">
+      <div class="auth-form-container">
+        <h2>Get Started</h2>
+        <p class="subtitle">Sign in to access the archive or create a new account</p>
+        
+        <!-- Tabs -->
+        <div class="auth-tabs">
+          <button class="auth-tab active" id="loginTabBtn" onclick="showTab('login')">Sign In</button>
+          <button class="auth-tab" id="registerTabBtn" onclick="showTab('register')">Register</button>
+        </div>
+        
+        <!-- Login Form -->
+        <div id="loginForm">
+          <div id="loginError" class="form-error" style="display:none"></div>
+          
+          <div class="form-group">
+            <label for="loginEmail">Email Address</label>
+            <input type="email" id="loginEmail" class="form-control" placeholder="Enter your email">
+          </div>
+          
+          <div class="form-group">
+            <label for="loginPassword">Password</label>
+            <input type="password" id="loginPassword" class="form-control" placeholder="Enter your password">
+          </div>
+          
+          <button id="loginBtn" class="btn btn-primary w-100 btn-lg" onclick="doLogin()">
+            <i class="bi bi-box-arrow-in-right"></i> Sign In
+          </button>
+          
+          <div id="googleSignIn" class="d-flex justify-content-center">
+            <!-- Google Sign-In button will be rendered here -->
+          </div>
+        </div>
+        
+        <!-- Register Form -->
+        <div id="registerForm" style="display:none">
+          <div id="regError" class="form-error" style="display:none"></div>
+          
+          <div class="form-group">
+            <label for="regName">Full Name</label>
+            <input type="text" id="regName" class="form-control" placeholder="Enter your full name">
+          </div>
+          
+          <div class="form-group">
+            <label for="regEmail">Email Address</label>
+            <input type="email" id="regEmail" class="form-control" placeholder="Enter your email">
+          </div>
+          
+          <div class="form-group">
+            <label for="regSchool">School / Institution</label>
+            <input type="text" id="regSchool" class="form-control" placeholder="e.g., University of the Assumption">
+          </div>
+          
+          <div class="form-group">
+            <label for="regPassword">Password</label>
+            <input type="password" id="regPassword" class="form-control" placeholder="Create a password">
+          </div>
+          
+          <button id="registerBtn" class="btn btn-success w-100 btn-lg" onclick="doRegister()">
+            <i class="bi bi-person-plus"></i> Create Account
+          </button>
+        </div>
+        
+        <p class="text-center text-muted mt-3" style="font-size: 0.85rem;">
+          By continuing, you agree to the terms of service.
+        </p>
+      </div>
+    </div>
   </div>
 
-  <script>
-    const BACKEND = 'http://localhost:4000/api';
-
-    function showError(selector, msg){
-      const el = document.getElementById(selector);
-      if (!msg) { el.style.display='none'; el.textContent=''; return; }
-      el.style.display='block'; el.textContent = msg;
-    }
-
-    async function doLoginPage(){
-      showError('loginError','');
-      const email = document.getElementById('pageLoginEmail').value.trim();
-      const password = document.getElementById('pageLoginPassword').value;
-      if (!email || !password) { showError('loginError','Please enter email and password'); return; }
-      try{
-        const res = await fetch(`${BACKEND}/auth/login`,{
-          method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email,password})
-        });
-        const body = await res.json();
-        if (!res.ok) { showError('loginError', body.message || 'Login failed'); return; }
-        if (body.accessToken) localStorage.setItem('accessToken', body.accessToken);
-        if (body.user) localStorage.setItem('user', JSON.stringify(body.user));
-        // Redirect: admins -> admin dashboard, others -> kiosk index
-        const role = body.user && body.user.role ? String(body.user.role).toLowerCase() : '';
-        if (role === 'admin') {
-          window.location.href = '/admin.html';
-        } else {
-          window.location.href = '/index.html';
-        }
-      }catch(err){ showError('loginError','Network error during login'); }
-    }
-
-    async function doRegisterPage(){
-      showError('regError','');
-      const fullName = document.getElementById('pageRegName').value.trim();
-      const email = document.getElementById('pageRegEmail').value.trim();
-      const school = document.getElementById('pageRegSchool').value.trim();
-      const password = document.getElementById('pageRegPassword').value;
-      if (!fullName || !email || !school || !password) { showError('regError','Please fill all fields'); return; }
-      try{
-        const res = await fetch(`${BACKEND}/auth/register`,{
-          method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({fullName,email,password, school})
-        });
-        const body = await res.json();
-        if (!res.ok) { showError('regError', body.message || 'Registration failed'); return; }
-        if (body.accessToken) localStorage.setItem('accessToken', body.accessToken);
-        if (body.user) localStorage.setItem('user', JSON.stringify(body.user));
-        // Redirect after registration: admins -> admin dashboard, others -> kiosk index
-        const regRole = body.user && body.user.role ? String(body.user.role).toLowerCase() : '';
-        if (regRole === 'admin') {
-          window.location.href = '/admin.html';
-        } else {
-          window.location.href = '/index.html';
-        }
-      }catch(err){ showError('regError','Network error during registration'); }
-    }
-
-    document.getElementById('pageDoLogin').addEventListener('click', doLoginPage);
-    document.getElementById('pageDoRegister').addEventListener('click', doRegisterPage);
-
-    // allow pressing Enter in inputs to trigger form actions
-    ['pageLoginEmail','pageLoginPassword'].forEach(id=>document.getElementById(id).addEventListener('keypress', (e)=>{ if(e.key==='Enter') doLoginPage(); }));
-    ['pageRegName','pageRegEmail','pageRegPassword'].forEach(id=>document.getElementById(id).addEventListener('keypress', (e)=>{ if(e.key==='Enter') doRegisterPage(); }));
-  </script>
-
-  <!-- Google Identity Services (load this so the Google button can render) -->
-  <script src="https://accounts.google.com/gsi/client" async defer></script>
-
-  <script>
-    // Google Identity Services: handle credential response
-    // Replace the CLIENT_ID value below with your Google OAuth Client ID for this to work.
-    function handleCredentialResponse(response){
-      try{
-        const payload = JSON.parse(atob(response.credential.split('.')[1]));
-        const user = { fullName: payload.name || payload.email, email: payload.email, picture: payload.picture };
-        // Store a Google-stamped access token locally. Backend verification is not implemented here.
-        localStorage.setItem('accessToken', 'google:' + response.credential);
-        localStorage.setItem('user', JSON.stringify(user));
-        // Redirect to kiosk
-        window.location.href = '/';
-      }catch(e){ console.warn('Google sign-in parse failed', e); }
-    }
-
-    function initGoogleButton(containerId){
-      if (!window.google || !google.accounts || !google.accounts.id) return;
-      google.accounts.id.initialize({ client_id: 'REPLACE_WITH_GOOGLE_CLIENT_ID', callback: handleCredentialResponse, ux_mode: 'popup' });
-      const el = document.getElementById(containerId);
-      if (el) google.accounts.id.renderButton(el, { theme: 'outline', size: 'large' });
-    }
-
-    // On page load try to render the Google button
-    window.addEventListener('DOMContentLoaded', ()=>{ setTimeout(()=>initGoogleButton('g_id_on_page'), 300); });
-  </script>
-
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    const BACKEND = 'http://localhost:5000/api';
+    
+    // Tab switching
+    function showTab(tab) {
+      document.getElementById('loginForm').style.display = tab === 'login' ? 'block' : 'none';
+      document.getElementById('registerForm').style.display = tab === 'register' ? 'block' : 'none';
+      document.getElementById('loginTabBtn').classList.toggle('active', tab === 'login');
+      document.getElementById('registerTabBtn').classList.toggle('active', tab === 'register');
+      // Clear errors
+      document.getElementById('loginError').style.display = 'none';
+      document.getElementById('regError').style.display = 'none';
+    }
+    
+    function showError(id, msg) {
+      const el = document.getElementById(id);
+      if (!msg) { el.style.display = 'none'; return; }
+      el.textContent = msg;
+      el.style.display = 'block';
+    }
+    
+    // Login
+    async function doLogin() {
+      showError('loginError', '');
+      const email = document.getElementById('loginEmail').value.trim();
+      const password = document.getElementById('loginPassword').value;
+      
+      if (!email || !password) {
+        showError('loginError', 'Please enter email and password');
+        return;
+      }
+      
+      try {
+        const res = await fetch(`${BACKEND}/auth/login`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password })
+        });
+        const body = await res.json();
+        
+        if (!res.ok) {
+          showError('loginError', body.message || 'Login failed');
+          return;
+        }
+        
+        const token = body.accessToken || body.token;
+        if (!token || token === 'undefined' || token === 'null') {
+          showError('loginError', 'Login failed: missing access token');
+          return;
+        }
+
+        localStorage.setItem('accessToken', token);
+        localStorage.setItem('user', JSON.stringify(body.user));
+        
+        // Redirect based on role
+        if (body.user.role === 'Admin') {
+          window.location.href = '/admin.html';
+        } else {
+          window.location.href = '/index.html';
+        }
+      } catch (err) {
+        showError('loginError', 'Network error. Please try again.');
+      }
+    }
+    
+    // Register
+    async function doRegister() {
+      showError('regError', '');
+      const fullName = document.getElementById('regName').value.trim();
+      const email = document.getElementById('regEmail').value.trim();
+      const password = document.getElementById('regPassword').value;
+      
+      if (!fullName || !email || !password) {
+        showError('regError', 'Please fill in all required fields');
+        return;
+      }
+      
+      try {
+        const res = await fetch(`${BACKEND}/auth/register`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ fullName, email, password })
+        });
+        const body = await res.json();
+        
+        if (!res.ok) {
+          showError('regError', body.message || 'Registration failed');
+          return;
+        }
+        
+        const token = body.accessToken || body.token;
+        if (!token || token === 'undefined' || token === 'null') {
+          showError('regError', 'Registration failed: missing access token');
+          return;
+        }
+
+        localStorage.setItem('accessToken', token);
+        localStorage.setItem('user', JSON.stringify(body.user));
+        
+        // Redirect based on role
+        if (body.user.role === 'Admin') {
+          window.location.href = '/admin.html';
+        } else {
+          window.location.href = '/index.html';
+        }
+      } catch (err) {
+        showError('regError', 'Network error. Please try again.');
+      }
+    }
+    
+    // Enter key handlers
+    document.getElementById('loginPassword').addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') doLogin();
+    });
+    document.getElementById('regPassword').addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') doRegister();
+    });
+    
+    // Check if already logged in
+    const token = localStorage.getItem('accessToken');
+    const user = localStorage.getItem('user');
+    if (token && token !== 'undefined' && token !== 'null' && user) {
+      try {
+        const userData = JSON.parse(user);
+        if (userData.role === 'Admin') {
+          window.location.href = '/admin.html';
+        } else {
+          window.location.href = '/index.html';
+        }
+      } catch (e) {}
+    } else if (token === 'undefined' || token === 'null') {
+      localStorage.removeItem('accessToken');
+    }
+  </script>
 </body>
 </html>
