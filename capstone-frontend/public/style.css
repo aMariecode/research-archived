@@ -742,7 +742,6 @@ body {
 .admin-sidebar-brand-icon {
   width: 40px;
   height: 40px;
-  background: var(--accent);
   border-radius: var(--radius-sm);
   justify-content: center;
   object-fit: contain;
@@ -916,6 +915,43 @@ body {
 .admin-panel-tab.active {
   background: var(--primary);
   color: white;
+}
+
+.settings-card {
+  background: white;
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius);
+  padding: 2rem;
+  margin-bottom: 1.5rem;
+}
+
+.settings-card h4 {
+  color: var(--primary);
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+}
+
+.settings-card p {
+  margin-bottom: 1.5rem;
+}
+
+.settings-card .form-group {
+  margin-bottom: 1rem;
+}
+
+.settings-card .form-group label {
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+}
+
+.settings-card .form-control {
+  padding: 0.75rem;
+  border: 1px solid var(--gray-300);
+  border-radius: var(--radius-sm);
+}
+
+.settings-card .btn {
+  margin-top: 1rem;
 }
 
 /* ============================================
