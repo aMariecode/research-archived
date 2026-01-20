@@ -3,394 +3,458 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Capstone Library Kiosk</title>
+  <title>UA Research Archive — Capstone Library</title>
   <link rel="stylesheet" href="style.css">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
 </head>
 <body>
-  <nav class="navbar navbar-dark bg-dark">
-    <div class="container-fluid">
-      <span class="navbar-brand mb-0 h1">Capstone Library Kiosk</span>
-      <div class="d-flex align-items-center">
-        <div id="userBadge" class="me-2 text-white small" style="display:none"></div>
-        <button id="registerBtn" class="btn btn-outline-light btn-sm me-2">Register</button>
-        <button id="loginBtn" class="btn btn-outline-light btn-sm me-2">Login</button>
-        <button id="logoutBtn" class="btn btn-outline-light btn-sm" style="display:none">Logout</button>
+  <!-- Navigation -->
+  <nav class="main-nav">
+    <div class="nav-container">
+      <a href="/" class="nav-brand">
+        <img src="ua-seal.png" alt="University of the Assumption" class="nav-brand-icon">
+        <div class="nav-brand-text">
+          <h1>University of the Assumption</h1>
+          <span>Student Projects Showcase</span>
+        </div>
+      </a>
+      
+      <ul class="nav-menu">
+        <li><a href="/index.html" class="active"><i class="bi bi-house"></i> Home</a></li>
+        <li><a href="#projects"><i class="bi bi-collection"></i> Projects</a></li>
+      </ul>
+      
+      <div class="nav-actions">
+        <div id="guestActions">
+          <a href="/login.html" class="btn btn-outline-light btn-sm">Sign In</a>
+        </div>
+        <div id="userActions" style="display:none">
+          <div class="nav-user">
+            <span id="userName">User</span>
+            <div class="dropdown">
+              <button class="btn btn-sm btn-outline-light dropdown-toggle" data-bs-toggle="dropdown">
+                <i class="bi bi-chevron-down"></i>
+              </button>
+              <ul class="dropdown-menu dropdown-menu-end">
+                <li id="adminLink" style="display:none"><a class="dropdown-item" href="/admin.html"><i class="bi bi-speedometer2"></i> Admin Dashboard</a></li>
+                <li><a class="dropdown-item" href="#" onclick="logout()"><i class="bi bi-box-arrow-right"></i> Logout</a></li>
+              </ul>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </nav>
 
-  <div class="container-fluid mt-3">
-    <div class="row">
-      <div class="col-12 col-md-2">
-        <div class="list-group" id="categoryList">
-          <!-- categories rendered here -->
-        </div>
-      </div>
-
-      <div class="col-12 col-md-9">
-        <div class="d-flex justify-content-between align-items-center mb-2">
-          <h4 class="mb-0">Menu</h4>
-          <div class="input-group w-50">
-            <input id="searchInput" class="form-control form-control-sm" placeholder="Search menu items...">
-            <button id="searchBtn" class="btn btn-primary btn-sm">Search</button>
-          </div>
-        </div>
-
-        <div id="menuGrid" class="row g-3">
-          <!-- menu items rendered here -->
-        </div>
-      </div>
-
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="hero-content">
+      <h1><i class="bi bi-mortarboard"></i> Explore Student Research</h1>
+      <p>Discover innovative capstone projects from the Bachelor of Information Technology program at the University of the Assumption</p>
       
-    </div>
-  </div>
-
-  <template id="menuCardTpl">
-    <div class="col-12 col-sm-6 col-lg-4">
-      <div class="card h-100 menu-card">
-        <img src="" class="card-img-top item-img" alt="">
-        <div class="card-body d-flex flex-column">
-          <h6 class="card-title item-name"></h6>
-          <p class="card-text item-desc text-muted small"></p>
-          <div class="mt-auto d-flex justify-content-between align-items-center">
-            <small class="text-muted item-price"></small>
-            <button class="btn btn-primary btn-sm add-btn">Details</button>
-          </div>
+      <div class="hero-search">
+        <input type="text" id="searchInput" placeholder="Search projects by title, author, or keyword...">
+        <button class="btn btn-primary" onclick="searchProjects()">
+          <i class="bi bi-search"></i> Search
+        </button>
+      </div>
+      
+      <div class="hero-stats">
+        <div class="hero-stat">
+          <div class="hero-stat-value" id="statProjects">0</div>
+          <div class="hero-stat-label">Projects</div>
+        </div>
+        <div class="hero-stat">
+          <div class="hero-stat-value" id="statYears">0</div>
+          <div class="hero-stat-label">Batch Years</div>
+        </div>
+        <div class="hero-stat">
+          <div class="hero-stat-value" id="statAuthors">0</div>
+          <div class="hero-stat-label">Authors</div>
         </div>
       </div>
     </div>
-  </template>
+  </section>
 
-  <!-- Detail Modal -->
-  <div class="modal fade" id="detailModal" tabindex="-1" aria-labelledby="detailModalLabel" aria-hidden="true">
+  <!-- Filter Section -->
+  <section class="filter-section">
+    <div class="filter-container">
+      <div class="filter-tabs" id="yearTabs">
+        <button class="filter-tab active" data-year="all">All Years</button>
+        <!-- Year tabs will be dynamically added -->
+      </div>
+      
+      <div class="filter-options">
+        <select class="filter-select" id="sortSelect" onchange="sortProjects()">
+          <option value="newest">Newest First</option>
+          <option value="oldest">Oldest First</option>
+          <option value="title">Title A-Z</option>
+        </select>
+      </div>
+    </div>
+  </section>
+
+  <!-- Projects Section -->
+  <section class="projects-section" id="projects">
+    <div class="projects-header">
+      <h2><i class="bi bi-grid-3x3-gap"></i> Capstone Projects</h2>
+      <span class="projects-count" id="projectsCount">Loading...</span>
+    </div>
+    
+    <div class="projects-grid" id="projectsGrid">
+      <!-- Project cards will be dynamically added -->
+    </div>
+    
+    <div class="empty-state" id="emptyState" style="display:none">
+      <div class="empty-state-icon"><i class="bi bi-inbox"></i></div>
+      <h3>No projects found</h3>
+      <p>Try adjusting your search or filter criteria</p>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="main-footer" id="about">
+    <div class="footer-content">
+      <div class="footer-section">
+        <h4>UA Research Archive</h4>
+        <p>A digital repository for capstone projects from the Bachelor of Information Technology program at the University of the Assumption.</p>
+      </div>
+      <div class="footer-section">
+        <h4>Quick Links</h4>
+        <a href="/index.html">Home</a>
+        <a href="#projects">Browse Projects</a>
+        <a href="/login.html">Sign In</a>
+      </div>
+      <div class="footer-section">
+        <h4>Contact</h4>
+        <p>University of the Assumption<br>City of San Fernando, Pampanga</p>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2026 UA Research Archive. Bachelor of Information Technology.</p>
+    </div>
+  </footer>
+
+  <!-- Project Detail Modal -->
+  <div class="modal fade" id="projectModal" tabindex="-1">
     <div class="modal-dialog modal-lg modal-dialog-centered">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title" id="detailModalLabel">Project Details</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          <h5 class="modal-title" id="modalTitle">Project Details</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
         </div>
-        <div class="modal-body" id="detailModalBody">
-          <!-- filled dynamically -->
+        <div class="modal-body" id="modalBody">
+          <!-- Content will be dynamically added -->
         </div>
         <div class="modal-footer">
-              <button id="viewPdfBtn" type="button" class="btn btn-primary">View PDF</button>
-              <button id="downloadPdfBtn" type="button" class="btn btn-success">Download</button>
-              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-            </div>
+          <button type="button" class="btn btn-outline-primary" id="viewPdfBtn">
+            <i class="bi bi-eye"></i> View PDF
+          </button>
+          <button type="button" class="btn btn-success" id="downloadPdfBtn">
+            <i class="bi bi-download"></i> Download
+          </button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        </div>
       </div>
     </div>
   </div>
 
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
   <script>
-    // Sample projects data (batches 2023 and 2024) — used as fallback when backend not available
-    let PROJECTS = [
-      { id: 'p1', title: 'Smart Campus Navigation', authors: 'A. Santos, B. Cruz', batch: 2023, abstract: 'Indoor navigation app for campus buildings using BLE beacons.', img: 'https://via.placeholder.com/300x180?text=Project+1', pdf: 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf' },
-      { id: 'p2', title: 'Automated Attendance System', authors: 'C. Reyes', batch: 2023, abstract: 'Face-recognition based attendance integrated with QR backups.', img: 'https://via.placeholder.com/300x180?text=Project+2', pdf: 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf' },
-      { id: 'p3', title: 'Capstone Archive Search', authors: 'D. Lee, E. Gomez', batch: 2024, abstract: 'Searchable repository for capstone projects with filters and analytics.', img: 'https://via.placeholder.com/300x180?text=Project+3', pdf: 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf' },
-      { id: 'p4', title: 'Energy Monitoring Dashboard', authors: 'F. Tan', batch: 2024, abstract: 'IoT system for monitoring and visualizing energy consumption.', img: 'https://via.placeholder.com/300x180?text=Project+4', pdf: 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf' }
-    ];
+    const BACKEND = 'http://localhost:5000/api';
+    let allProjects = [];
+    let filteredProjects = [];
+    let currentYear = 'all';
+    let currentProject = null;
 
-    let currentCategory = 'All';
-    const BACKEND = 'http://localhost:4000/api';
-
-    // Google Identity Services handlers (client-side only)
-    function handleCredentialResponse(response){
-      try{
-        const payload = JSON.parse(atob(response.credential.split('.')[1]));
-        const user = { fullName: payload.name || payload.email, email: payload.email, picture: payload.picture };
-        localStorage.setItem('accessToken','google:' + response.credential);
-        localStorage.setItem('user', JSON.stringify(user));
-        showLoggedIn(user);
-        fetchCapstones();
-      }catch(e){ console.warn('Google sign-in parse failed', e); }
-    }
-
-    function initGoogleButton(containerId){
-      if (!window.google || !google.accounts || !google.accounts.id) return;
-      google.accounts.id.initialize({ client_id: 'REPLACE_WITH_GOOGLE_CLIENT_ID', callback: handleCredentialResponse, ux_mode: 'popup' });
-      const el = document.getElementById(containerId);
-      if (el) google.accounts.id.renderButton(el, { theme: 'outline', size: 'large' });
-    }
-
-    function renderCategories(){
-      const categories = ['All', ...Array.from(new Set(PROJECTS.map(m=>m.batch)))];
-      const el = document.getElementById('categoryList');
-      el.innerHTML = '';
-      categories.forEach(cat => {
-        const a = document.createElement('button');
-        a.className = 'list-group-item list-group-item-action' + (String(cat)===String(currentCategory)? ' active':'');
-        a.textContent = cat;
-        a.onclick = ()=>{ currentCategory = cat; renderCategories(); renderMenu(); };
-        el.appendChild(a);
-      });
-    }
-
-    function renderMenu(filter=''){
-      const grid = document.getElementById('menuGrid');
-      grid.innerHTML = '';
-      const tpl = document.getElementById('menuCardTpl');
-      const qs = (filter || '').toLowerCase();
-      PROJECTS.filter(item => (currentCategory==='All' || String(item.batch)===String(currentCategory)) && (!qs || item.title.toLowerCase().includes(qs) || item.authors.toLowerCase().includes(qs) || item.abstract.toLowerCase().includes(qs)))
-        .forEach(item => {
-          const node = tpl.content.cloneNode(true);
-          node.querySelector('.item-img').src = item.img;
-          node.querySelector('.item-img').alt = item.title;
-          node.querySelector('.item-name').textContent = item.title;
-          node.querySelector('.item-desc').textContent = item.authors + ' — ' + item.abstract;
-          node.querySelector('.item-price').textContent = `Batch ${item.batch}`;
-          const btn = node.querySelector('.add-btn');
-          btn.textContent = 'Details';
-          btn.onclick = ()=> showDetails(item);
-          node.querySelector('.item-img').onclick = () => showDetails(item);
-          grid.appendChild(node);
-        });
-    }
-
-    function showDetails(project){
-      const modalTitle = document.getElementById('detailModalLabel');
-      const modalBody = document.getElementById('detailModalBody');
-      modalTitle.textContent = project.title;
-      modalBody.innerHTML = `
-        <p><strong>Authors:</strong> ${project.authors}</p>
-        <p><strong>Batch:</strong> ${project.batch}</p>
-        <p>${project.abstract}</p>
-      `;
-
-      // set View and Download handlers
-      const viewBtn = document.getElementById('viewPdfBtn');
-      const downloadBtn = document.getElementById('downloadPdfBtn');
-      viewBtn.onclick = ()=> { window.open(project.pdf, '_blank'); };
-      downloadBtn.onclick = ()=> {
-        const a = document.createElement('a');
-        a.href = project.pdf;
-        a.download = project.title.replace(/\s+/g, '_') + '.pdf';
-        document.body.appendChild(a);
-        a.click();
-        a.remove();
-      };
-
-      // (recent list removed) showDetails no longer adds to a recent viewer section
-
-      const modal = new bootstrap.Modal(document.getElementById('detailModal'));
-      modal.show();
-    }
-
-    async function performSearch(){
-      const q = document.getElementById('searchInput').value.trim();
-      if (!q) { renderMenu(); return; }
+    // Check auth status
+    function checkAuth() {
       const token = localStorage.getItem('accessToken');
-      if (token) {
+      const user = localStorage.getItem('user');
+      
+      if (token && token !== 'undefined' && token !== 'null' && user) {
         try {
-          const res = await fetch(`${BACKEND}/search?query=${encodeURIComponent(q)}`, {
-            headers: { 'Authorization': `Bearer ${token}` }
-          });
-          if (res.ok) {
-            const body = await res.json().catch(()=>null);
-            const items = (body && (body.capstones || body.results || body.data)) || body || [];
-            if (Array.isArray(items) && items.length > 0) {
-              renderFromArray(items);
-              return;
-            }
+          const userData = JSON.parse(user);
+          document.getElementById('guestActions').style.display = 'none';
+          document.getElementById('userActions').style.display = 'block';
+          document.getElementById('userName').textContent = userData.fullName || 'User';
+          document.getElementById('userAvatar').textContent = (userData.fullName || 'U').charAt(0).toUpperCase();
+          
+          if (userData.role === 'Admin') {
+            document.getElementById('adminLink').style.display = 'block';
           }
-        } catch (err) {
-          console.warn('Backend search failed, falling back to client filter', err);
-        }
-      }
-      // fallback to client-side
-      renderMenu(q);
-    }
-
-    function renderFromArray(arr){
-      const grid = document.getElementById('menuGrid');
-      grid.innerHTML = '';
-      const tpl = document.getElementById('menuCardTpl');
-      // normalize and set PROJECTS to the fetched array so categories and other views update
-      const normalized = arr.map(raw => ({
-        id: raw._id || raw.id || raw.capstoneId || raw.name || String(Math.random()),
-        title: raw.title || raw.name || raw.fullName || 'Untitled',
-        authors: raw.authors || raw.authorsName || raw.owner || 'Unknown',
-        batch: raw.batch || raw.year || raw.batchYear || 'N/A',
-        abstract: raw.abstract || raw.description || raw.summary || '',
-        img: raw.previewImage || raw.image || 'https://via.placeholder.com/300x180?text=Project',
-        pdf: raw.pdfUrl || raw.pdf || raw.file || '#'
-      }));
-
-      PROJECTS = normalized.length ? normalized : PROJECTS;
-      PROJECTS.forEach(item => {
-        // normalize fields from backend if necessary
-        const node = tpl.content.cloneNode(true);
-        node.querySelector('.item-img').src = item.img;
-        node.querySelector('.item-img').alt = item.title;
-        node.querySelector('.item-name').textContent = item.title;
-        node.querySelector('.item-desc').textContent = item.authors + ' — ' + item.abstract;
-        node.querySelector('.item-price').textContent = `Batch ${item.batch}`;
-        const btn = node.querySelector('.add-btn');
-        btn.textContent = 'Details';
-        btn.onclick = ()=> showDetails(item);
-        node.querySelector('.item-img').onclick = () => showDetails(item);
-        grid.appendChild(node);
-      });
-    }
-
-    document.getElementById('searchBtn').addEventListener('click', performSearch);
-    document.getElementById('searchInput').addEventListener('keypress', (e)=>{ if(e.key==='Enter') performSearch(); });
-
-    // auth helpers
-    function showLoggedIn(user){
-      document.getElementById('userBadge').textContent = `Hi, ${user.fullName || user.email}`;
-      document.getElementById('userBadge').style.display = 'block';
-      document.getElementById('loginBtn').style.display = 'none';
-      document.getElementById('logoutBtn').style.display = 'inline-block';
-    }
-
-    function showLoggedOut(){
-      document.getElementById('userBadge').style.display = 'none';
-      document.getElementById('loginBtn').style.display = 'inline-block';
-      document.getElementById('logoutBtn').style.display = 'none';
-    }
-
-    async function login(email, password){
-      try{
-        const res = await fetch(`${BACKEND}/auth/login`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email, password })
-        });
-        const body = await res.json();
-        if (!res.ok) throw new Error(body.message || 'Login failed');
-        if (body.accessToken) localStorage.setItem('accessToken', body.accessToken);
-        if (body.user) localStorage.setItem('user', JSON.stringify(body.user));
-        showLoggedIn(body.user || { fullName: body.user?.fullName || email, email });
-        await fetchCapstones();
-      }catch(err){
-        alert('Login error: ' + (err.message || err));
+        } catch (e) {}
+      } else if (token === 'undefined' || token === 'null') {
+        localStorage.removeItem('accessToken');
       }
     }
 
-    async function register(fullName, email, password, school){
-      try{
-        const res = await fetch(`${BACKEND}/auth/register`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ fullName, email, password, school })
-        });
-        const body = await res.json();
-        if (!res.ok) throw new Error(body.message || 'Registration failed');
-        if (body.accessToken) localStorage.setItem('accessToken', body.accessToken);
-        if (body.user) localStorage.setItem('user', JSON.stringify(body.user));
-        showLoggedIn(body.user || { fullName: body.user?.fullName || fullName, email });
-        await fetchCapstones();
-      }catch(err){
-        alert('Registration error: ' + (err.message || err));
-      }
-    }
-
-    function logout(){
+    function logout() {
       localStorage.removeItem('accessToken');
       localStorage.removeItem('user');
-      showLoggedOut();
-      // fallback to local PROJECTS
-      renderCategories();
-      renderMenu();
+      window.location.href = '/login.html';
     }
 
-    async function fetchCapstones(){
-      const token = localStorage.getItem('accessToken');
-      if (!token) {
-        // remain using local PROJECTS
-        renderCategories();
-        renderMenu();
+    // Fetch projects from backend
+    async function fetchProjects() {
+      try {
+        const res = await fetch(`${BACKEND}/capstone/approved`);
+        if (!res.ok) throw new Error('Failed to fetch');
+        const data = await res.json();
+        allProjects = data.data || [];
+        filteredProjects = [...allProjects];
+        
+        updateStats();
+        generateYearTabs();
+        renderProjects();
+      } catch (err) {
+        console.error('Error fetching projects:', err);
+        document.getElementById('projectsCount').textContent = 'Error loading projects';
+      }
+    }
+
+    // Update stats
+    function updateStats() {
+      document.getElementById('statProjects').textContent = allProjects.length;
+      
+      const years = [...new Set(allProjects.map(p => p.year))];
+      document.getElementById('statYears').textContent = years.length;
+      
+      let authorCount = 0;
+      allProjects.forEach(p => {
+        authorCount += (p.members || []).length;
+      });
+      document.getElementById('statAuthors').textContent = authorCount;
+    }
+
+    // Generate year filter tabs
+    function generateYearTabs() {
+      const years = [...new Set(allProjects.map(p => p.year))].sort((a, b) => b - a);
+      const tabsContainer = document.getElementById('yearTabs');
+      
+      // Keep the "All Years" tab
+      tabsContainer.innerHTML = '<button class="filter-tab active" data-year="all" onclick="filterByYear(\'all\')">All Years</button>';
+      
+      years.forEach(year => {
+        const tab = document.createElement('button');
+        tab.className = 'filter-tab';
+        tab.dataset.year = year;
+        tab.textContent = year;
+        tab.onclick = () => filterByYear(year);
+        tabsContainer.appendChild(tab);
+      });
+    }
+
+    // Filter by year
+    function filterByYear(year) {
+      currentYear = year;
+      
+      // Update active tab
+      document.querySelectorAll('.filter-tab').forEach(tab => {
+        tab.classList.toggle('active', tab.dataset.year == year);
+      });
+      
+      applyFilters();
+    }
+
+    // Search projects
+    function searchProjects() {
+      applyFilters();
+    }
+
+    // Sort projects
+    function sortProjects() {
+      applyFilters();
+    }
+
+    // Apply all filters
+    function applyFilters() {
+      const searchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
+      const sortBy = document.getElementById('sortSelect').value;
+      
+      filteredProjects = allProjects.filter(project => {
+        // Year filter
+        if (currentYear !== 'all' && project.year != currentYear) return false;
+        
+        // Search filter
+        if (searchTerm) {
+          const title = (project.title || '').toLowerCase();
+          const abstract = (project.abstract || '').toLowerCase();
+          const authors = (project.members || []).join(' ').toLowerCase();
+          
+          if (!title.includes(searchTerm) && 
+              !abstract.includes(searchTerm) && 
+              !authors.includes(searchTerm)) {
+            return false;
+          }
+        }
+        
+        return true;
+      });
+      
+      // Sort
+      filteredProjects.sort((a, b) => {
+        switch (sortBy) {
+          case 'newest': return (b.year || 0) - (a.year || 0);
+          case 'oldest': return (a.year || 0) - (b.year || 0);
+          case 'title': return (a.title || '').localeCompare(b.title || '');
+          default: return 0;
+        }
+      });
+      
+      renderProjects();
+    }
+
+    // Render projects
+    function renderProjects() {
+      const grid = document.getElementById('projectsGrid');
+      const emptyState = document.getElementById('emptyState');
+      const countEl = document.getElementById('projectsCount');
+      
+      if (filteredProjects.length === 0) {
+        grid.innerHTML = '';
+        emptyState.style.display = 'block';
+        countEl.textContent = '0 projects';
         return;
       }
-      try{
-        const res = await fetch(`${BACKEND}/capstone/all`, {
-          headers: { 'Authorization': `Bearer ${token}` }
-        });
-        if (!res.ok) throw new Error('Failed to fetch capstones');
-        const body = await res.json();
-        const arr = Array.isArray(body) ? body : (body.capstones || body.data || body.results || []);
-        if (arr.length) renderFromArray(arr);
-        else { renderCategories(); renderMenu(); }
-      }catch(err){
-        console.warn('fetchCapstones failed:', err);
-        renderCategories(); renderMenu();
+      
+      emptyState.style.display = 'none';
+      countEl.textContent = `${filteredProjects.length} project${filteredProjects.length !== 1 ? 's' : ''}`;
+      
+      grid.innerHTML = filteredProjects.map(project => `
+        <div class="project-card">
+          <div class="project-card-image">
+            ${project.previewImage?.url 
+              ? `<img src="${project.previewImage.url}" alt="${project.title}">`
+              : '<div class="placeholder-icon"><i class="bi bi-file-earmark-text"></i></div>'
+            }
+            <span class="project-card-year">${project.year || 'N/A'}</span>
+          </div>
+          <div class="project-card-body">
+            <h3 class="project-card-title">${project.title || 'Untitled'}</h3>
+            <p class="project-card-authors">
+              <i class="bi bi-people"></i>
+              ${(project.members || []).join(', ') || 'No authors listed'}
+            </p>
+            <p class="project-card-abstract">${project.abstract || 'No abstract available'}</p>
+            <div class="project-card-footer">
+              <button class="btn btn-outline-primary btn-sm" onclick="viewProject('${project._id}')">
+                <i class="bi bi-eye"></i> Details
+              </button>
+              ${project.pdfUrl ? `
+                <button class="btn btn-primary btn-sm" onclick="downloadPdf('${project.pdfUrl}', '${project.title}')">
+                  <i class="bi bi-download"></i> PDF
+                </button>
+              ` : ''}
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // View project details
+    function viewProject(id) {
+      const project = allProjects.find(p => p._id === id);
+      if (!project) return;
+      
+      currentProject = project;
+      
+      document.getElementById('modalTitle').textContent = project.title || 'Project Details';
+      document.getElementById('modalBody').innerHTML = `
+        <div class="row">
+          <div class="col-md-5">
+            ${project.previewImage?.url 
+              ? `<img src="${project.previewImage.url}" class="img-fluid rounded mb-3" alt="${project.title}">`
+              : '<div class="bg-light rounded p-5 text-center text-muted mb-3"><i class="bi bi-image" style="font-size: 3rem;"></i></div>'
+            }
+          </div>
+          <div class="col-md-7">
+            <h4>${project.title || 'Untitled'}</h4>
+            <p class="text-muted mb-2"><i class="bi bi-calendar"></i> Batch ${project.year || 'N/A'}</p>
+            <p class="mb-3"><i class="bi bi-people text-accent"></i> <strong>Authors:</strong><br>${(project.members || []).join(', ') || 'Not specified'}</p>
+            ${project.adviser ? `<p class="mb-3"><i class="bi bi-person-badge"></i> <strong>Adviser:</strong> ${project.adviser}</p>` : ''}
+          </div>
+        </div>
+        <hr>
+        <h5>Abstract</h5>
+        <p>${project.abstract || 'No abstract available'}</p>
+        ${project.technologies?.length ? `
+          <h5 class="mt-3">Technologies</h5>
+          <p>${project.technologies.join(', ')}</p>
+        ` : ''}
+      `;
+      
+      // Setup PDF buttons
+      const viewBtn = document.getElementById('viewPdfBtn');
+      const downloadBtn = document.getElementById('downloadPdfBtn');
+      
+      if (project.pdfUrl) {
+        viewBtn.style.display = 'inline-flex';
+        downloadBtn.style.display = 'inline-flex';
+        viewBtn.onclick = () => window.open(project.pdfUrl, '_blank');
+        downloadBtn.onclick = () => downloadPdf(project.pdfUrl, project.title);
+      } else {
+        viewBtn.style.display = 'none';
+        downloadBtn.style.display = 'none';
+      }
+      
+      // Track view analytics
+      trackView(id);
+      
+      new bootstrap.Modal(document.getElementById('projectModal')).show();
+    }
+
+    // Download PDF
+    function downloadPdf(url, title) {
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `${title || 'capstone'}.pdf`;
+      link.target = '_blank';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
+      // Track download
+      if (currentProject) {
+        trackDownload(currentProject._id);
       }
     }
 
-    // wire login UI
-    document.getElementById('loginBtn').addEventListener('click', ()=>{
-      const modalHtml = `
-        <div class="modal fade" id="loginModal" tabindex="-1" aria-hidden="true">
-          <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content auth-modal">
-              <div class="modal-header"><h5 class="modal-title">Login</h5><button class="btn-close" data-bs-dismiss="modal"></button></div>
-              <div class="modal-body">
-                <div class="mb-2"><input id="loginEmailInput" class="form-control" placeholder="Email"></div>
-                <div class="mb-2"><input id="loginPasswordInput" type="password" class="form-control" placeholder="Password"></div>
-                <div class="my-3 text-center">
-                  <div id="g_id_on_index" class="d-flex justify-content-center"></div>
-                  <div class="small mt-2 text-muted">Or sign in with your Gmail account</div>
-                </div>
-              </div>
-              <div class="modal-footer"><button id="doLoginBtn" class="btn btn-primary">Login</button><button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button></div>
-            </div>
-          </div>
-        </div>`;
-      const wrapper = document.createElement('div'); wrapper.innerHTML = modalHtml; document.body.appendChild(wrapper);
-      const loginModal = new bootstrap.Modal(document.getElementById('loginModal'));
-      loginModal.show();
-      // try to render Google button into the modal
-      setTimeout(()=>initGoogleButton('g_id_on_index'), 300);
-      document.getElementById('doLoginBtn').addEventListener('click', async ()=>{
-        const email = document.getElementById('loginEmailInput').value;
-        const password = document.getElementById('loginPasswordInput').value;
-        await login(email, password);
-        loginModal.hide();
-        document.getElementById('loginModal').remove();
-      });
-    });
-    // wire register UI
-    document.getElementById('registerBtn').addEventListener('click', ()=>{
-      const modalHtml = `
-        <div class="modal fade" id="registerModal" tabindex="-1" aria-hidden="true">
-          <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content auth-modal">
-              <div class="modal-header"><h5 class="modal-title">Register</h5><button class="btn-close" data-bs-dismiss="modal"></button></div>
-              <div class="modal-body">
-                        <div class="mb-2"><input id="regNameInput" class="form-control" placeholder="Full name"></div>
-                        <div class="mb-2"><input id="regEmailInput" class="form-control" placeholder="Email"></div>
-                        <div class="mb-2"><input id="regSchoolInput" class="form-control" placeholder="Name of School"></div>
-                        <div class="mb-2"><input id="regPasswordInput" type="password" class="form-control" placeholder="Password"></div>
-                      </div>
-                      <div class="modal-footer"><button id="doRegisterBtn" class="btn btn-primary">Register</button><button class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button></div>
-            </div>
-          </div>
-        </div>`;
-      const wrapper = document.createElement('div'); wrapper.innerHTML = modalHtml; document.body.appendChild(wrapper);
-      const registerModal = new bootstrap.Modal(document.getElementById('registerModal'));
-      registerModal.show();
-      document.getElementById('doRegisterBtn').addEventListener('click', async ()=>{
-        const name = document.getElementById('regNameInput').value;
-        const email = document.getElementById('regEmailInput').value;
-        const school = document.getElementById('regSchoolInput').value;
-        const password = document.getElementById('regPasswordInput').value;
-        await register(name, email, password, school);
-        registerModal.hide();
-        document.getElementById('registerModal').remove();
-      });
-    });
-    document.getElementById('logoutBtn').addEventListener('click', logout);
+    // Track view analytics
+    async function trackView(id) {
+      try {
+        const token = localStorage.getItem('accessToken');
+        if (token) {
+          await fetch(`${BACKEND}/capstone/analytics/view/${id}`, {
+            method: 'POST',
+            headers: { 'Authorization': `Bearer ${token}` }
+          });
+        }
+      } catch (e) {}
+    }
 
-    // init state
-    const savedUser = localStorage.getItem('user');
-    if (savedUser) showLoggedIn(JSON.parse(savedUser)); else showLoggedOut();
-    // initial data load
-    fetchCapstones();
+    // Track download analytics
+    async function trackDownload(id) {
+      try {
+        const token = localStorage.getItem('accessToken');
+        if (token) {
+          await fetch(`${BACKEND}/capstone/analytics/download/${id}`, {
+            method: 'POST',
+            headers: { 'Authorization': `Bearer ${token}` }
+          });
+        }
+      } catch (e) {}
+    }
+
+    // Search on Enter key
+    document.getElementById('searchInput').addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') searchProjects();
+    });
+
+    // Initialize
+    checkAuth();
+    fetchProjects();
   </script>
-  <!-- Google Identity Services -->
-  <script src="https://accounts.google.com/gsi/client" async defer></script>
-
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

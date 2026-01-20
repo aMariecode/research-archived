@@ -38,6 +38,7 @@ const upload = multer({ storage: multer.memoryStorage() });
 
 router.get("/all", verifyToken, CapstoneController.getAllCapstone);
 router.get("/recent", verifyToken, CapstoneController.getAllCapstone);
+router.get("/approved", CapstoneController.getApprovedCapstones);
 router.post("/", verifyToken, authorizeRoles("Faculty", "Admin"),
     upload.fields([
         { name: 'previewImage', maxCount: 1 },

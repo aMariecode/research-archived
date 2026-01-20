@@ -3,6 +3,7 @@ const AdminController = require("../controllers/AdminController.js");
 const { verifyToken, authorizeRoles } = require("../middlewares/auth.js");
 
 router.get("/all", verifyToken, authorizeRoles("Admin"), AdminController.getAllUsers);
+router.get("/capstones/all", verifyToken, authorizeRoles("Admin"), AdminController.getAllCapstones);
 router.get("/roles/:role", verifyToken, authorizeRoles("Admin"), AdminController.getAllUsersByRole);
 router.get("/archived/users", verifyToken, authorizeRoles("Admin"), AdminController.getAllArchivedUsers);
 router.get("/archived/capstones", verifyToken, authorizeRoles("Faculty","Admin"), AdminController.getAllArchivedCapstones);
