@@ -19,14 +19,17 @@ connectDB();
 
 app.use(express.json());
 app.use(express.urlencoded({extended:true}))
-// Allow CORS from the frontend origin. When `credentials: true` is set,
-// the Access-Control-Allow-Origin header cannot be '*', so list the
-// allowed origins explicitly (development only).
+// CORS configuration - supports both development and production
+const allowedOrigins = [
+    'http://localhost:3000',
+    'http://127.0.0.1:3000',
+    process.env.FRONTEND_URL, // Add your Vercel frontend URL here
+].filter(Boolean); // Remove undefined values
+
 app.use(cors({
-    origin: [
-        'http://localhost:3000',
-        'http://127.0.0.1:3000'
-    ],
+    origin: process.env.NODE_ENV === 'production' 
+        ? (allowedOrigins.length > 2 ? allowedOrigins : process.env.FRONTEND_URL)
+        : allowedOrigins,
     credentials: true,
     methods: ['GET','POST','PUT','PATCH','DELETE','OPTIONS']
 }));
