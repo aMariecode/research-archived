@@ -1,5 +1,6 @@
 // API entry point for Vercel serverless deployment
 const express = require("express");
+const path = require("path");
 const cors = require("cors");
 const connectDB = require("../capstone-backend/config/db");
 const AnalyticsEvent = require('../capstone-backend/models/AnalyticsEvent');
@@ -18,6 +19,9 @@ async function ensureDBConnection() {
 
 app.use(express.json());
 app.use(express.urlencoded({extended:true}));
+
+// Serve static files from frontend
+app.use(express.static(path.join(__dirname, '../capstone-frontend/public')));
 
 // CORS configuration for production
 app.use(cors({
@@ -63,6 +67,11 @@ app.use("/api/capstone", require("../capstone-backend/routes/CapstoneRoutes.js")
 app.use("/api/admin", require("../capstone-backend/routes/AdminRoutes.js"));
 app.use("/api/user", require("../capstone-backend/routes/UserRoutes.js"));
 app.use("/api/admin/analytics", require("../capstone-backend/routes/AnalyticsRoutes.js"));
+
+// Serve SPA - fallback to index.html for client-side routing
+app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, '../capstone-frontend/public/index.html'));
+});
 
 // Error handling middleware
 app.use((err, req, res, next) => {
