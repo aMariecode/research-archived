@@ -1,0 +1,26 @@
+# Ignore environment variables
+.env
+.env.local
+.env.production
+
+# Ignore Vercel build outputs
+.vercel
+
+# Node modules
+node_modules/
+
+# Logs
+*.log
+npm-debug.log*
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# Build outputs
+dist/
+build/
