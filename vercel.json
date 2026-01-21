@@ -19,14 +19,5 @@
       "src": "/(.*)",
       "dest": "capstone-frontend/app.js"
     }
-  ],
-  "env": {
-    "MONGO_URI": "@mongo_uri",
-    "JWT_SECRET": "@jwt_secret",
-    "CLOUD_NAME": "@cloud_name",
-    "CLOUD_API_KEY": "@cloud_api_key",
-    "CLOUD_API_SECRET": "@cloud_api_secret",
-    "GOOGLE_CLIENT_ID": "@google_client_id",
-    "GOOGLE_CLIENT_SECRET": "@google_client_secret"
-  }
+  ]
 }
