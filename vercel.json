@@ -1,15 +1,10 @@
 {
   "version": 2,
-  "buildCommand": "npm run build --prefix capstone-backend && npm run build --prefix capstone-frontend",
-  "public": "capstone-frontend/public",
+  "public": true,
   "rewrites": [
     {
       "source": "/api/(.*)",
       "destination": "/api"
-    },
-    {
-      "source": "/(.*)",
-      "destination": "/index.html"
     }
   ]
 }
