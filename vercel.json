@@ -1,23 +1,15 @@
 {
   "version": 2,
-  "builds": [
+  "buildCommand": "npm run build --prefix capstone-backend && npm run build --prefix capstone-frontend",
+  "public": "capstone-frontend/public",
+  "rewrites": [
     {
-      "src": "capstone-frontend/app.js",
-      "use": "@vercel/node"
+      "source": "/api/(.*)",
+      "destination": "/api"
     },
     {
-      "src": "capstone-backend/server.js",
-      "use": "@vercel/node"
-    }
-  ],
-  "routes": [
-    {
-      "src": "/api/(.*)",
-      "dest": "capstone-backend/server.js"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "capstone-frontend/app.js"
+      "source": "/(.*)",
+      "destination": "/index.html"
     }
   ]
 }
