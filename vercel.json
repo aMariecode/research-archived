@@ -1,3 +1,19 @@
 {
-  "version": 2
+  "version": 2,
+  "builds": [
+    {
+      "src": "capstone-backend/server.js",
+      "use": "@vercel/node"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "capstone-backend/server.js"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "capstone-backend/server.js"
+    }
+  ]
 }
