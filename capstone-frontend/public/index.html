@@ -379,10 +379,6 @@
         <hr>
         <h5>Abstract</h5>
         <p>${project.abstract || 'No abstract available'}</p>
-        ${project.technologies?.length ? `
-          <h5 class="mt-3">Technologies</h5>
-          <p>${project.technologies.join(', ')}</p>
-        ` : ''}
       `;
       
       // Setup PDF buttons

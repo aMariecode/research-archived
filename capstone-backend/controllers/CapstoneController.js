@@ -195,9 +195,35 @@ exports.addCapstone = async (req, res) => {
         );
         console.log('PDF uploaded:', pdfResult.url);
 
-        // Parse arrays if they're sent as JSON strings
-        const parsedMembers = typeof members === 'string' ? JSON.parse(members) : members;
-        const parsedTechnologies = typeof technologies === 'string' ? JSON.parse(technologies) : technologies;
+        // Robust parsing for members and technologies
+        let parsedMembers = [];
+        let parsedTechnologies = [];
+        // Parse members
+        try {
+            if (typeof members === 'string') {
+                parsedMembers = JSON.parse(members);
+                if (!Array.isArray(parsedMembers)) throw new Error();
+            } else if (Array.isArray(members)) {
+                parsedMembers = members;
+            }
+        } catch {
+            parsedMembers = members
+                ? members.split(',').map(m => m.trim()).filter(Boolean)
+                : [];
+        }
+        // Parse technologies
+        try {
+            if (typeof technologies === 'string') {
+                parsedTechnologies = JSON.parse(technologies);
+                if (!Array.isArray(parsedTechnologies)) throw new Error();
+            } else if (Array.isArray(technologies)) {
+                parsedTechnologies = technologies;
+            }
+        } catch {
+            parsedTechnologies = technologies
+                ? technologies.split(',').map(t => t.trim()).filter(Boolean)
+                : [];
+        }
 
         const newCapstone = new Capstone({
             title,
@@ -306,26 +332,6 @@ exports.updateCapstone = async (req, res) => {
             }
             capstone.year = yearNum;
         }
-
-        const parseToArray = (value) => {
-            if (value === undefined || value === null) return undefined;
-            if (Array.isArray(value)) return value;
-            if (typeof value !== "string") return [String(value)];
-            const trimmed = value.trim();
-            if (!trimmed) return [];
-            try {
-                const parsed = JSON.parse(trimmed);
-                return Array.isArray(parsed) ? parsed : [String(parsed)];
-            } catch {
-                return [trimmed];
-            }
-        };
-
-        const parsedMembers = parseToArray(members);
-        if (parsedMembers !== undefined) capstone.members = parsedMembers;
-
-        const parsedTechnologies = parseToArray(technologies);
-        if (parsedTechnologies !== undefined) capstone.technologies = parsedTechnologies;
 
         // previewImage removed
 
