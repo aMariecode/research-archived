@@ -9,6 +9,45 @@ const baseFilter = {
   isApproved: true,
 };
 
+// Helper function to fix PDF URLs with proper filename
+const fixPdfUrl = (pdfUrl, title) => {
+    if (!pdfUrl || !pdfUrl.includes('cloudinary.com')) {
+        return pdfUrl;
+    }
+    
+    // Clean title for filename
+    const cleanTitle = (title || 'capstone').replace(/[^a-zA-Z0-9_-]/g, '_').substring(0, 50);
+    const filename = `${cleanTitle}.pdf`;
+    
+    // If URL already has fl_attachment, replace it; otherwise add it
+    if (pdfUrl.includes('/raw/upload/fl_attachment')) {
+        return pdfUrl.replace(/\/raw\/upload\/fl_attachment[^/]*\//, `/raw/upload/fl_attachment:${filename}/`);
+    } else if (pdfUrl.includes('/raw/upload/')) {
+        return pdfUrl.replace('/raw/upload/', `/raw/upload/fl_attachment:${filename}/`);
+    }
+    
+    return pdfUrl;
+};
+
+// Helper function to process capstone data
+const processCapstoneData = (capstone) => {
+    if (Array.isArray(capstone)) {
+        return capstone.map(c => {
+            const data = c.toObject ? c.toObject() : c;
+            if (data.pdfUrl) {
+                data.pdfUrl = fixPdfUrl(data.pdfUrl, data.title);
+            }
+            return data;
+        });
+    } else {
+        const data = capstone.toObject ? capstone.toObject() : capstone;
+        if (data.pdfUrl) {
+            data.pdfUrl = fixPdfUrl(data.pdfUrl, data.title);
+        }
+        return data;
+    }
+};
+
 const projection = {
   _id: 1,
   previewImage: 1,
@@ -19,6 +58,7 @@ const projection = {
   year: 1,
   technologies: 1,
   githubUrl: 1,
+  pdfUrl: 1,
   createdBy: 1,
   createdAt: 1,
 };
@@ -63,9 +103,10 @@ exports.searchCapstones = async (req, res) => {
       .sort(sort)
       .populate(createdByPopulate);
 
+    const processedData = processCapstoneData(results);
     return res.status(200).send({
       message: results.length ? "Search results:" : "No results found.",
-      data: results,
+      data: processedData,
     });
   } catch (err) {
     console.error("searchCapstones error:", err);
@@ -115,9 +156,10 @@ exports.filterCapstones = async (req, res) => {
       .sort({ year: -1 })
       .populate(createdByPopulate);
 
+    const processedData = processCapstoneData(results);
     return res.status(200).send({
       message: results.length ? "Filtered results:" : "No results found.",
-      data: results,
+      data: processedData,
     });
   } catch (err) {
     console.error("filterCapstones error:", err);
