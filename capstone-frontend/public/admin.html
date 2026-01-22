@@ -634,7 +634,7 @@
       const imageFile = document.getElementById('capImage').files[0];
       const pdfFile = document.getElementById('capPdf').files[0];
       if (imageFile) formData.append('previewImage', imageFile);
-      if (pdfFile) formData.append('pdf', pdfFile);
+      if (pdfFile) formData.append('pdfFile', pdfFile);
       
       try {
         const url = id ? `${BACKEND}/capstone/${id}` : `${BACKEND}/capstone`;
