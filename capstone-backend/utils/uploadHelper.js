@@ -48,11 +48,11 @@ const uploadToCloudinary = (buffer, folder, resourceType = 'image', originalFile
     if (resourceType === 'pdf' && originalFilename) {
       const timestamp = Date.now();
       const randomString = Math.random().toString(36).substring(7);
-      // Remove extension from original filename and add it back
+      // Remove extension from original filename
       const cleanName = originalFilename.replace(/\.pdf$/i, '');
       const safeName = cleanName.replace(/[^a-zA-Z0-9]/g, '_').substring(0, 50);
-      // Include .pdf in the public_id so Cloudinary recognizes it as PDF
-      options.public_id = `${safeName}_${timestamp}_${randomString}.pdf`;
+      // Do NOT include .pdf in public_id - Cloudinary handles raw files differently
+      options.public_id = `${safeName}_${timestamp}_${randomString}`;
     }
 
     if (resourceType === 'image') {
