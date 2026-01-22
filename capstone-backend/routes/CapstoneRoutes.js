@@ -11,8 +11,19 @@ router.get('/test-inline-pdf', (req, res) => {
         }
     });
 });
-// Analytics endpoints for file view/download
+// Analytics endpoints for file view/download/visit
 const AnalyticsEvent = require('../models/AnalyticsEvent');
+
+// Track site visits
+router.post('/analytics/visit', async (req, res) => {
+    try {
+        await AnalyticsEvent.create({ type: 'visit', user: req.user?._id });
+        res.status(200).send({ message: 'Visit logged' });
+    } catch (e) {
+        res.status(500).send({ message: 'Error logging visit' });
+    }
+});
+
 router.post('/analytics/view/:capstoneId', async (req, res) => {
     try {
         await AnalyticsEvent.create({ type: 'view', user: req.user?._id, capstone: req.params.capstoneId });

@@ -436,12 +436,11 @@
     async function trackView(id) {
       try {
         const token = localStorage.getItem('accessToken');
-        if (token) {
-          await fetch(`${BACKEND}/capstone/analytics/view/${id}`, {
-            method: 'POST',
-            headers: { 'Authorization': `Bearer ${token}` }
-          });
-        }
+        const headers = token ? { 'Authorization': `Bearer ${token}` } : {};
+        await fetch(`${BACKEND}/capstone/analytics/view/${id}`, {
+          method: 'POST',
+          headers
+        });
       } catch (e) {}
     }
 
@@ -449,12 +448,11 @@
     async function trackDownload(id) {
       try {
         const token = localStorage.getItem('accessToken');
-        if (token) {
-          await fetch(`${BACKEND}/capstone/analytics/download/${id}`, {
-            method: 'POST',
-            headers: { 'Authorization': `Bearer ${token}` }
-          });
-        }
+        const headers = token ? { 'Authorization': `Bearer ${token}` } : {};
+        await fetch(`${BACKEND}/capstone/analytics/download/${id}`, {
+          method: 'POST',
+          headers
+        });
       } catch (e) {}
     }
 
@@ -463,9 +461,17 @@
       if (e.key === 'Enter') searchProjects();
     });
 
+    // Track site visit
+    async function trackSiteVisit() {
+      try {
+        await fetch(`${BACKEND}/capstone/analytics/visit`, { method: 'POST' });
+      } catch (e) {}
+    }
+
     // Initialize
     checkAuth();
     fetchProjects();
+    trackSiteVisit();
   </script>
 </body>
 </html>
