@@ -2,44 +2,12 @@ const Capstone = require("../models/Capstone.js");
 const User = require("../models/User.js");
 const { deleteFromCloudinary } = require("../utils/uploadHelper");
 
-// Helper function to fix PDF URLs with proper filename and .pdf extension
-const fixPdfUrl = (pdfUrl, title) => {
-    if (!pdfUrl || !pdfUrl.includes('cloudinary.com')) {
-        return pdfUrl;
-    }
-    
-    // Clean title for filename and ensure .pdf extension
-    const cleanTitle = (title || 'capstone').replace(/[^a-zA-Z0-9_-]/g, '_').substring(0, 50);
-    const filename = `${cleanTitle}.pdf`;
-    
-    // Split URL and add/replace fl_attachment transformation
-    const urlParts = pdfUrl.split('/upload/');
-    if (urlParts.length === 2) {
-        // Remove existing fl_attachment if present
-        let resourcePath = urlParts[1].replace(/^fl_attachment[^/]*\//, '');
-        // Add new fl_attachment with encoded filename
-        return `${urlParts[0]}/upload/fl_attachment:${encodeURIComponent(filename)}/${resourcePath}`;
-    }
-    
-    return pdfUrl;
-};
-
-// Helper function to process capstone data
+// Helper function to process capstone data (no URL transformations needed - PDF served via proxy)
 const processCapstoneData = (capstone) => {
     if (Array.isArray(capstone)) {
-        return capstone.map(c => {
-            const data = c.toObject ? c.toObject() : c;
-            if (data.pdfUrl) {
-                data.pdfUrl = fixPdfUrl(data.pdfUrl, data.title);
-            }
-            return data;
-        });
+        return capstone.map(c => c.toObject ? c.toObject() : c);
     } else {
-        const data = capstone.toObject ? capstone.toObject() : capstone;
-        if (data.pdfUrl) {
-            data.pdfUrl = fixPdfUrl(data.pdfUrl, data.title);
-        }
-        return data;
+        return capstone.toObject ? capstone.toObject() : capstone;
     }
 };
 
