@@ -343,7 +343,7 @@
                 <i class="bi bi-eye"></i> Details
               </button>
               ${project.pdfUrl ? `
-                <button class="btn btn-primary btn-sm" onclick="downloadPdf('${project.pdfUrl}', '${project.title}')">
+                <button class="btn btn-primary btn-sm" onclick="downloadPdf('${project._id}', '${project.title}')">
                   <i class="bi bi-download"></i> PDF
                 </button>
               ` : ''}
@@ -381,15 +381,16 @@
         <p>${project.abstract || 'No abstract available'}</p>
       `;
       
-      // Setup PDF buttons
+      // Setup PDF buttons - use backend proxy for proper PDF headers
       const viewBtn = document.getElementById('viewPdfBtn');
       const downloadBtn = document.getElementById('downloadPdfBtn');
       
       if (project.pdfUrl) {
         viewBtn.style.display = 'inline-flex';
         downloadBtn.style.display = 'inline-flex';
-        viewBtn.onclick = () => window.open(project.pdfUrl, '_blank');
-        downloadBtn.onclick = () => downloadPdf(project.pdfUrl, project.title);
+        // Use backend endpoint that sets proper Content-Type and Content-Disposition
+        viewBtn.onclick = () => window.open(`${BACKEND}/capstone/${project._id}/pdf`, '_blank');
+        downloadBtn.onclick = () => downloadPdf(project._id, project.title);
       } else {
         viewBtn.style.display = 'none';
         downloadBtn.style.display = 'none';
@@ -401,16 +402,19 @@
       new bootstrap.Modal(document.getElementById('projectModal')).show();
     }
 
-    // Download PDF
-    function downloadPdf(url, title) {
-      // Clean title and ensure .pdf extension
+    // Download PDF using backend proxy endpoint
+    function downloadPdf(capstoneId, title) {
+      // Clean title for filename
       const cleanTitle = (title || 'capstone').replace(/[^a-zA-Z0-9_-]/g, '_');
-      const filename = cleanTitle.endsWith('.pdf') ? cleanTitle : `${cleanTitle}.pdf`;
+      const filename = `${cleanTitle}.pdf`;
       
+      // Use backend endpoint with download=1 parameter for attachment disposition
+      const downloadUrl = `${BACKEND}/capstone/${capstoneId}/pdf?download=1`;
+      
+      // Create a temporary link to trigger download
       const link = document.createElement('a');
-      link.href = url;
+      link.href = downloadUrl;
       link.download = filename;
-      link.target = '_blank';
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
