@@ -3,13 +3,13 @@ const { uploadToCloudinary, deleteFromCloudinary } = require('../utils/uploadHel
 const https = require("https");
 const axios = require('../utils/axios');
 
-// Helper function to fix PDF URLs with proper filename
+// Helper function to fix PDF URLs with proper filename and .pdf extension
 const fixPdfUrl = (pdfUrl, title) => {
     if (!pdfUrl || !pdfUrl.includes('cloudinary.com')) {
         return pdfUrl;
     }
     
-    // Clean title for filename
+    // Clean title for filename and ensure .pdf extension
     const cleanTitle = (title || 'capstone').replace(/[^a-zA-Z0-9_-]/g, '_').substring(0, 50);
     const filename = `${cleanTitle}.pdf`;
     

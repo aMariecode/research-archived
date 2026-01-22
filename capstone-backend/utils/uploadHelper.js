@@ -67,9 +67,13 @@ const uploadToCloudinary = (buffer, folder, resourceType = 'image', originalFile
         } else {
           let finalUrl = result.secure_url;
           
-          // For PDFs, add fl_attachment flag to force download with proper filename
+          // For PDFs, add fl_attachment flag to force download with proper filename and .pdf extension
           if (resourceType === 'pdf' && originalFilename) {
-            const cleanFilename = originalFilename.replace(/[^a-zA-Z0-9._-]/g, '_');
+            let cleanFilename = originalFilename.replace(/[^a-zA-Z0-9._-]/g, '_');
+            // Ensure filename ends with .pdf
+            if (!cleanFilename.toLowerCase().endsWith('.pdf')) {
+              cleanFilename += '.pdf';
+            }
             finalUrl = result.secure_url.replace(
               '/raw/upload/',
               `/raw/upload/fl_attachment:${cleanFilename}/`
