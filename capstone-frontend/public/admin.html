@@ -627,7 +627,10 @@
       formData.append('title', document.getElementById('capTitle').value);
       formData.append('year', document.getElementById('capYear').value);
       formData.append('abstract', document.getElementById('capAbstract').value);
-      formData.append('members', document.getElementById('capMembers').value);
+      // Send members as JSON array
+      const membersRaw = document.getElementById('capMembers').value;
+      const membersArray = membersRaw.split(',').map(m => m.trim()).filter(Boolean);
+      formData.append('members', JSON.stringify(membersArray));
       formData.append('adviser', document.getElementById('capAdviser').value);
       formData.append('technologies', document.getElementById('capTech').value);
       
