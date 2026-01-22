@@ -329,21 +329,31 @@ exports.downloadCapstonePdf = async (req, res) => {
             .trim()
             .replace(/\s+/g, "_");
 
-        // Set Content-Disposition based on ?download=1 param
-        res.setHeader("Content-Type", "application/pdf");
-        if (req.query.download === '1') {
-            res.setHeader("Content-Disposition", `attachment; filename=\"${safeName}.pdf\"`);
-            console.log("[PDF] Content-Disposition: attachment; filename=", `${safeName}.pdf`);
-        } else {
-            res.setHeader("Content-Disposition", `inline; filename=\"${safeName}.pdf\"`);
-            console.log("[PDF] Content-Disposition: inline; filename=", `${safeName}.pdf`);
-        }
         try {
-            const response = await axios.get(capstone.pdfUrl, { responseType: 'stream' });
-            response.data.pipe(res);
+            // Fetch the PDF from Cloudinary
+            const response = await axios.get(capstone.pdfUrl, { 
+                responseType: 'arraybuffer',
+                headers: {
+                    'Accept': 'application/pdf'
+                }
+            });
+            
+            // Set proper headers for PDF viewing/downloading
+            res.setHeader("Content-Type", "application/pdf");
+            res.setHeader("Content-Length", response.data.length);
+            res.setHeader("Cache-Control", "public, max-age=86400");
+            
+            if (req.query.download === '1') {
+                res.setHeader("Content-Disposition", `attachment; filename="${safeName}.pdf"`);
+            } else {
+                res.setHeader("Content-Disposition", `inline; filename="${safeName}.pdf"`);
+            }
+            
+            // Send the PDF data
+            res.send(Buffer.from(response.data));
         } catch (e) {
-            console.error("PDF proxy error (axios):", e);
-            res.status(500).send({ message: "Failed to download PDF" });
+            console.error("PDF proxy error (axios):", e.message);
+            res.status(500).send({ message: "Failed to fetch PDF from storage" });
         }
     } catch (err) {
         console.error("downloadCapstonePdf error:", err);
