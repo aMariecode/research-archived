@@ -51,7 +51,7 @@ exports.getAllCapstone = async (req, res) => {
         // If you want to hide unapproved capstones from users, add a filter here
         const capstone = await Capstone.find(query)
         .select(
-            "_id title abstract members adviser year technologies pdfUrl pdfPublicId githubUrl createdBy approvedBy status isApproved"
+            "_id title abstract members adviser year technologies pdfUrl pdfPublicId githubUrl createdBy approvedBy status isApproved createdAt"
         )
         .populate([
             {
@@ -92,7 +92,7 @@ exports.getRecentCapstones = async (req, res) => {
             isApproved: true
         })
         .select(
-            "_id title abstract members adviser year technologies pdfUrl pdfPublicId githubUrl createdBy approvedBy"
+            "_id title abstract members adviser year technologies pdfUrl pdfPublicId githubUrl createdBy approvedBy createdAt"
         )
         .populate([
             {
@@ -131,7 +131,7 @@ exports.getApprovedCapstones = async (req, res) => {
             isApproved: true
         })
         .select(
-            "_id title abstract members adviser year technologies pdfUrl pdfPublicId githubUrl createdBy approvedBy previewImage"
+            "_id title abstract members adviser year technologies pdfUrl pdfPublicId githubUrl createdBy approvedBy previewImage createdAt"
         )
         .populate([
             {
@@ -171,7 +171,7 @@ exports.getCapstoneById = async (req, res) => {
         let query = { _id: capstoneId, isDeleted: false };
         // Show all capstones to all users (admin or not)
         const specificCapstone = await Capstone.findOne(query)
-            .select("_id title abstract members adviser year technologies pdfUrl pdfPublicId githubUrl createdBy approvedBy status isApproved")
+            .select("_id title abstract members adviser year technologies pdfUrl pdfPublicId githubUrl createdBy approvedBy status isApproved createdAt")
             .populate([
                 { path: "createdBy", select: "_id fullName email" },
                 { path: "approvedBy", select: "_id fullName email" }

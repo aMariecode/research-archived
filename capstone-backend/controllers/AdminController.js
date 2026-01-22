@@ -139,7 +139,7 @@ exports.getAllArchivedCapstones = async (req, res) => {
             isApproved: true
         })
         .select(
-            "_id title abstract adviser year pdfUrl pdfPublicId githubUrl createdBy approvedBy"
+            "_id title abstract adviser year pdfUrl pdfPublicId githubUrl createdBy approvedBy createdAt"
         )
         .sort({ year: -1 });
 
@@ -176,7 +176,7 @@ exports.getAllSubmittedCapstonesByStatus = async (req, res) => {
         }
         const submittedCapstones = await Capstone.find(query)
         .select(
-            "_id title abstract adviser year pdfUrl pdfPublicId githubUrl createdBy approvedBy status isApproved"
+            "_id title abstract adviser year pdfUrl pdfPublicId githubUrl createdBy approvedBy status isApproved createdAt"
         )
         .sort({ createdAt: 1 });
 
@@ -207,7 +207,7 @@ exports.getAllCapstones = async (req, res) => {
             isDeleted: false
         })
         .select(
-            "_id title abstract members adviser year technologies pdfUrl pdfPublicId githubUrl createdBy approvedBy status isApproved"
+            "_id title abstract members adviser year technologies pdfUrl pdfPublicId githubUrl createdBy approvedBy status isApproved createdAt"
         )
         .populate([
             {
