@@ -12,11 +12,13 @@ const fixPdfUrl = (pdfUrl, title) => {
     const cleanTitle = (title || 'capstone').replace(/[^a-zA-Z0-9_-]/g, '_').substring(0, 50);
     const filename = `${cleanTitle}.pdf`;
     
-    // If URL already has fl_attachment, replace it; otherwise add it
-    if (pdfUrl.includes('/raw/upload/fl_attachment')) {
-        return pdfUrl.replace(/\/raw\/upload\/fl_attachment[^/]*\//, `/raw/upload/fl_attachment:${filename}/`);
-    } else if (pdfUrl.includes('/raw/upload/')) {
-        return pdfUrl.replace('/raw/upload/', `/raw/upload/fl_attachment:${filename}/`);
+    // Split URL and add/replace fl_attachment transformation
+    const urlParts = pdfUrl.split('/upload/');
+    if (urlParts.length === 2) {
+        // Remove existing fl_attachment if present
+        let resourcePath = urlParts[1].replace(/^fl_attachment[^/]*\//, '');
+        // Add new fl_attachment with encoded filename
+        return `${urlParts[0]}/upload/fl_attachment:${encodeURIComponent(filename)}/${resourcePath}`;
     }
     
     return pdfUrl;

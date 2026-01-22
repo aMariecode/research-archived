@@ -51,7 +51,8 @@ const uploadToCloudinary = (buffer, folder, resourceType = 'image', originalFile
       // Remove extension from original filename and add it back
       const cleanName = originalFilename.replace(/\.pdf$/i, '');
       const safeName = cleanName.replace(/[^a-zA-Z0-9]/g, '_').substring(0, 50);
-      options.public_id = `${safeName}_${timestamp}_${randomString}`;
+      // Include .pdf in the public_id so Cloudinary recognizes it as PDF
+      options.public_id = `${safeName}_${timestamp}_${randomString}.pdf`;
     }
 
     if (resourceType === 'image') {
@@ -67,17 +68,18 @@ const uploadToCloudinary = (buffer, folder, resourceType = 'image', originalFile
         } else {
           let finalUrl = result.secure_url;
           
-          // For PDFs, add fl_attachment flag to force download with proper filename and .pdf extension
+          // For PDFs, add fl_attachment flag with proper filename
           if (resourceType === 'pdf' && originalFilename) {
             let cleanFilename = originalFilename.replace(/[^a-zA-Z0-9._-]/g, '_');
             // Ensure filename ends with .pdf
             if (!cleanFilename.toLowerCase().endsWith('.pdf')) {
               cleanFilename += '.pdf';
             }
-            finalUrl = result.secure_url.replace(
-              '/raw/upload/',
-              `/raw/upload/fl_attachment:${cleanFilename}/`
-            );
+            // Use proper Cloudinary transformation format
+            const urlParts = result.secure_url.split('/upload/');
+            if (urlParts.length === 2) {
+              finalUrl = `${urlParts[0]}/upload/fl_attachment:${encodeURIComponent(cleanFilename)}/${urlParts[1]}`;
+            }
           }
           
           resolve({
