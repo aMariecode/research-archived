@@ -86,7 +86,7 @@ exports.getAllArchivedUsers = async (req, res) => {
     } catch (err) {
         console.log(`Archived Users Fetching Error: ${err}`);
         return res.status(500).send({
-            message: "Server error when fetching archvied users",
+            message: "Server error when fetching archived users",
         });
     }
 }
@@ -98,7 +98,7 @@ exports.getAllArchivedCapstones = async (req, res) => {
             isApproved: true
         })
         .select(
-            "_id title abstract members adviser year technologies pdfUrl pdfPublicId githubUrl createdBy approvedBy"
+            "_id title abstract adviser year pdfUrl pdfPublicId githubUrl createdBy approvedBy"
         )
         .sort({ year: -1 });
 
@@ -134,7 +134,7 @@ exports.getAllSubmittedCapstonesByStatus = async (req, res) => {
         }
         const submittedCapstones = await Capstone.find(query)
         .select(
-            "_id title abstract members adviser year technologies pdfUrl pdfPublicId githubUrl createdBy approvedBy status isApproved"
+            "_id title abstract adviser year pdfUrl pdfPublicId githubUrl createdBy approvedBy status isApproved"
         )
         .sort({ createdAt: 1 });
 
