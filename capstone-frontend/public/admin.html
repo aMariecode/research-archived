@@ -437,11 +437,13 @@
           headers: { 'Authorization': `Bearer ${token}` }
         });
         if (analyticsRes.ok) {
-          const data = await analyticsRes.json();
-          document.getElementById('analyticsViews').textContent = data.fileViews || 0;
-          document.getElementById('analyticsDownloads').textContent = data.fileDownloads || 0;
-          document.getElementById('analyticsSiteVisits').textContent = data.siteVisits || 0;
-          document.getElementById('analyticsActiveUsers').textContent = data.activeUsers || 0;
+          const result = await analyticsRes.json();
+          const data = result.data || result;
+          // Backend returns: data.capstones.views, data.capstones.downloads, data.users.visits, data.users.active
+          document.getElementById('analyticsViews').textContent = data.capstones?.views || 0;
+          document.getElementById('analyticsDownloads').textContent = data.capstones?.downloads || 0;
+          document.getElementById('analyticsSiteVisits').textContent = data.users?.visits || 0;
+          document.getElementById('analyticsActiveUsers').textContent = data.users?.active || 0;
         }
       } catch (err) {
         console.error('Error loading dashboard:', err);
