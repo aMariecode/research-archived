@@ -3,6 +3,45 @@ const { uploadToCloudinary, deleteFromCloudinary } = require('../utils/uploadHel
 const https = require("https");
 const axios = require('../utils/axios');
 
+// Helper function to fix PDF URLs with proper filename
+const fixPdfUrl = (pdfUrl, title) => {
+    if (!pdfUrl || !pdfUrl.includes('cloudinary.com')) {
+        return pdfUrl;
+    }
+    
+    // Clean title for filename
+    const cleanTitle = (title || 'capstone').replace(/[^a-zA-Z0-9_-]/g, '_').substring(0, 50);
+    const filename = `${cleanTitle}.pdf`;
+    
+    // If URL already has fl_attachment, replace it; otherwise add it
+    if (pdfUrl.includes('/raw/upload/fl_attachment')) {
+        return pdfUrl.replace(/\/raw\/upload\/fl_attachment[^/]*\//, `/raw/upload/fl_attachment:${filename}/`);
+    } else if (pdfUrl.includes('/raw/upload/')) {
+        return pdfUrl.replace('/raw/upload/', `/raw/upload/fl_attachment:${filename}/`);
+    }
+    
+    return pdfUrl;
+};
+
+// Helper function to process capstone data
+const processCapstoneData = (capstone) => {
+    if (Array.isArray(capstone)) {
+        return capstone.map(c => {
+            const data = c.toObject ? c.toObject() : c;
+            if (data.pdfUrl) {
+                data.pdfUrl = fixPdfUrl(data.pdfUrl, data.title);
+            }
+            return data;
+        });
+    } else {
+        const data = capstone.toObject ? capstone.toObject() : capstone;
+        if (data.pdfUrl) {
+            data.pdfUrl = fixPdfUrl(data.pdfUrl, data.title);
+        }
+        return data;
+    }
+};
+
 exports.getAllCapstone = async (req, res) => {
     try {
         let query = { isDeleted: false };
@@ -31,9 +70,10 @@ exports.getAllCapstone = async (req, res) => {
             })
         };
 
+        const processedData = processCapstoneData(capstone);
         return res.status(200).send({
             message: "All Capstone Project Lists:",
-            data: capstone
+            data: processedData
         })
     } catch (err) {
         console.log(`Capstone Fetching Error: ${err}`);
@@ -71,9 +111,10 @@ exports.getRecentCapstones = async (req, res) => {
             })
         };
 
+        const processedData = processCapstoneData(capstone);
         return res.status(200).send({
             message: "Recent Capstone Project Lists:",
-            data: capstone
+            data: processedData
         });
 
     } catch (err) {
@@ -136,7 +177,9 @@ exports.getCapstoneById = async (req, res) => {
         if (!specificCapstone) {
             return res.status(404).send({ message: `Capstone with the ID: ${capstoneId} not found!` });
         }
-        return res.status(200).send({ message: `Capstone with the ID: ${capstoneId} found!`, data: specificCapstone });
+        
+        const processedData = processCapstoneData(specificCapstone);
+        return res.status(200).send({ message: `Capstone with the ID: ${capstoneId} found!`, data: processedData });
     } catch (err) {
         console.log(`Specific Capstone Fetching Error: ${err}`);
         return res.status(500).send({

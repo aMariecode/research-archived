@@ -2,6 +2,45 @@ const Capstone = require("../models/Capstone.js");
 const User = require("../models/User.js");
 const { deleteFromCloudinary } = require("../utils/uploadHelper");
 
+// Helper function to fix PDF URLs with proper filename
+const fixPdfUrl = (pdfUrl, title) => {
+    if (!pdfUrl || !pdfUrl.includes('cloudinary.com')) {
+        return pdfUrl;
+    }
+    
+    // Clean title for filename
+    const cleanTitle = (title || 'capstone').replace(/[^a-zA-Z0-9_-]/g, '_').substring(0, 50);
+    const filename = `${cleanTitle}.pdf`;
+    
+    // If URL already has fl_attachment, replace it; otherwise add it
+    if (pdfUrl.includes('/raw/upload/fl_attachment')) {
+        return pdfUrl.replace(/\/raw\/upload\/fl_attachment[^/]*\//, `/raw/upload/fl_attachment:${filename}/`);
+    } else if (pdfUrl.includes('/raw/upload/')) {
+        return pdfUrl.replace('/raw/upload/', `/raw/upload/fl_attachment:${filename}/`);
+    }
+    
+    return pdfUrl;
+};
+
+// Helper function to process capstone data
+const processCapstoneData = (capstone) => {
+    if (Array.isArray(capstone)) {
+        return capstone.map(c => {
+            const data = c.toObject ? c.toObject() : c;
+            if (data.pdfUrl) {
+                data.pdfUrl = fixPdfUrl(data.pdfUrl, data.title);
+            }
+            return data;
+        });
+    } else {
+        const data = capstone.toObject ? capstone.toObject() : capstone;
+        if (data.pdfUrl) {
+            data.pdfUrl = fixPdfUrl(data.pdfUrl, data.title);
+        }
+        return data;
+    }
+};
+
 exports.getAllUsers = async (req, res) => {
     try {
         const users = await User.find({
@@ -109,9 +148,10 @@ exports.getAllArchivedCapstones = async (req, res) => {
             });
         }
         
+        const processedData = processCapstoneData(archivedCapstones);
         return res.status(200).send({
             message: `List of archived capstone:`,
-            data: archivedCapstones
+            data: processedData
         })
     } catch (err) {
         console.log(`Archived Capstones Fetching Error: ${err}`);
@@ -145,9 +185,10 @@ exports.getAllSubmittedCapstonesByStatus = async (req, res) => {
             });
         }
 
+        const processedData = processCapstoneData(submittedCapstones);
         return res.status(200).send({
             message: `List of all ${status} submitted capstones:`,
-            data: submittedCapstones
+            data: processedData
         })
 
     } catch (err) {
@@ -185,9 +226,10 @@ exports.getAllCapstones = async (req, res) => {
             });
         }
 
+        const processedData = processCapstoneData(allCapstones);
         return res.status(200).send({
             message: `List of all capstones:`,
-            data: allCapstones
+            data: processedData
         })
 
     } catch (err) {
