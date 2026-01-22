@@ -274,7 +274,7 @@
       const sortBy = document.getElementById('sortSelect').value;
       
       filteredProjects = allProjects.filter(project => {
-        // Year filter
+        // Year filter (from year tabs)
         if (currentYear !== 'all' && project.year != currentYear) return false;
         
         // Search filter
@@ -282,10 +282,17 @@
           const title = (project.title || '').toLowerCase();
           const abstract = (project.abstract || '').toLowerCase();
           const authors = (project.members || []).join(' ').toLowerCase();
+          const adviser = (project.adviser || '').toLowerCase();
+          const technologies = (project.technologies || []).join(' ').toLowerCase();
+          const year = String(project.year || '');
           
+          // Check if search term matches any field
           if (!title.includes(searchTerm) && 
               !abstract.includes(searchTerm) && 
-              !authors.includes(searchTerm)) {
+              !authors.includes(searchTerm) &&
+              !adviser.includes(searchTerm) &&
+              !technologies.includes(searchTerm) &&
+              !year.includes(searchTerm)) {
             return false;
           }
         }
