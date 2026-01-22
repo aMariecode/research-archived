@@ -66,24 +66,11 @@ const uploadToCloudinary = (buffer, folder, resourceType = 'image', originalFile
           console.error('Cloudinary upload error:', error);
           reject(error);
         } else {
-          let finalUrl = result.secure_url;
-          
-          // For PDFs, add fl_attachment flag with proper filename
-          if (resourceType === 'pdf' && originalFilename) {
-            let cleanFilename = originalFilename.replace(/[^a-zA-Z0-9._-]/g, '_');
-            // Ensure filename ends with .pdf
-            if (!cleanFilename.toLowerCase().endsWith('.pdf')) {
-              cleanFilename += '.pdf';
-            }
-            // Use proper Cloudinary transformation format
-            const urlParts = result.secure_url.split('/upload/');
-            if (urlParts.length === 2) {
-              finalUrl = `${urlParts[0]}/upload/fl_attachment:${encodeURIComponent(cleanFilename)}/${urlParts[1]}`;
-            }
-          }
+          // Store the original secure_url - transformations will be applied when serving
+          console.log('Cloudinary upload success:', result.secure_url);
           
           resolve({
-            url: finalUrl,
+            url: result.secure_url,
             public_id: result.public_id,
           });
         }

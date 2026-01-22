@@ -3,44 +3,12 @@ const { uploadToCloudinary, deleteFromCloudinary } = require('../utils/uploadHel
 const https = require("https");
 const axios = require('../utils/axios');
 
-// Helper function to fix PDF URLs with proper filename and .pdf extension
-const fixPdfUrl = (pdfUrl, title) => {
-    if (!pdfUrl || !pdfUrl.includes('cloudinary.com')) {
-        return pdfUrl;
-    }
-    
-    // Clean title for filename and ensure .pdf extension
-    const cleanTitle = (title || 'capstone').replace(/[^a-zA-Z0-9_-]/g, '_').substring(0, 50);
-    const filename = `${cleanTitle}.pdf`;
-    
-    // Split URL and add/replace fl_attachment transformation
-    const urlParts = pdfUrl.split('/upload/');
-    if (urlParts.length === 2) {
-        // Remove existing fl_attachment if present
-        let resourcePath = urlParts[1].replace(/^fl_attachment[^/]*\//, '');
-        // Add new fl_attachment with encoded filename
-        return `${urlParts[0]}/upload/fl_attachment:${encodeURIComponent(filename)}/${resourcePath}`;
-    }
-    
-    return pdfUrl;
-};
-
-// Helper function to process capstone data
+// Helper function to process capstone data (no URL transformations needed - PDF served via proxy)
 const processCapstoneData = (capstone) => {
     if (Array.isArray(capstone)) {
-        return capstone.map(c => {
-            const data = c.toObject ? c.toObject() : c;
-            if (data.pdfUrl) {
-                data.pdfUrl = fixPdfUrl(data.pdfUrl, data.title);
-            }
-            return data;
-        });
+        return capstone.map(c => c.toObject ? c.toObject() : c);
     } else {
-        const data = capstone.toObject ? capstone.toObject() : capstone;
-        if (data.pdfUrl) {
-            data.pdfUrl = fixPdfUrl(data.pdfUrl, data.title);
-        }
-        return data;
+        return capstone.toObject ? capstone.toObject() : capstone;
     }
 };
 
@@ -330,13 +298,26 @@ exports.downloadCapstonePdf = async (req, res) => {
             .replace(/\s+/g, "_");
 
         try {
+            // Get the original Cloudinary URL without transformations
+            let pdfUrl = capstone.pdfUrl;
+            
+            // Remove fl_attachment transformation if present to get raw URL
+            if (pdfUrl.includes('/upload/fl_attachment')) {
+                pdfUrl = pdfUrl.replace(/\/upload\/fl_attachment[^/]*\//, '/upload/');
+            }
+            
+            console.log("[PDF] Fetching from URL:", pdfUrl);
+            
             // Fetch the PDF from Cloudinary
-            const response = await axios.get(capstone.pdfUrl, { 
+            const response = await axios.get(pdfUrl, { 
                 responseType: 'arraybuffer',
+                timeout: 30000,
                 headers: {
-                    'Accept': 'application/pdf'
+                    'Accept': '*/*'
                 }
             });
+            
+            console.log("[PDF] Fetched successfully, size:", response.data.length);
             
             // Set proper headers for PDF viewing/downloading
             res.setHeader("Content-Type", "application/pdf");
@@ -353,6 +334,7 @@ exports.downloadCapstonePdf = async (req, res) => {
             res.send(Buffer.from(response.data));
         } catch (e) {
             console.error("PDF proxy error (axios):", e.message);
+            console.error("PDF URL attempted:", capstone.pdfUrl);
             res.status(500).send({ message: "Failed to fetch PDF from storage" });
         }
     } catch (err) {
