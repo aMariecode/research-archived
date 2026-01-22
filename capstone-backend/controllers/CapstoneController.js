@@ -200,9 +200,11 @@ exports.addCapstone = async (req, res) => {
         let parsedTechnologies = [];
         // Parse members
         try {
-            if (typeof members === 'string') {
+            if (typeof members === 'string' && members.trim().startsWith('[')) {
                 parsedMembers = JSON.parse(members);
                 if (!Array.isArray(parsedMembers)) throw new Error();
+            } else if (typeof members === 'string') {
+                parsedMembers = members.split(',').map(m => m.trim()).filter(Boolean);
             } else if (Array.isArray(members)) {
                 parsedMembers = members;
             }
@@ -213,9 +215,11 @@ exports.addCapstone = async (req, res) => {
         }
         // Parse technologies
         try {
-            if (typeof technologies === 'string') {
+            if (typeof technologies === 'string' && technologies.trim().startsWith('[')) {
                 parsedTechnologies = JSON.parse(technologies);
                 if (!Array.isArray(parsedTechnologies)) throw new Error();
+            } else if (typeof technologies === 'string') {
+                parsedTechnologies = technologies.split(',').map(t => t.trim()).filter(Boolean);
             } else if (Array.isArray(technologies)) {
                 parsedTechnologies = technologies;
             }
