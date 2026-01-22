@@ -1,6 +1,6 @@
 // index.js — for user dashboard
 document.addEventListener('DOMContentLoaded', () => {
-  fetch('http://localhost:3000/api/user/capstones')
+  fetch('https://research-archived.onrender.com/api/user/capstones')
     .then(res => res.json())
     .then(data => {
       const fileList = document.getElementById('fileList');
