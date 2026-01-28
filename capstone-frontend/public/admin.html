@@ -63,7 +63,7 @@
               <div class="admin-card-header">
                 <div>
                   <div class="admin-card-value" id="statTotalProjects">0</div>
-                  <div class="admin-card-label">Total Projects</div>
+                  <div class="admin-card-label">Total Capstones</div>
                 </div>
                 <div class="admin-card-icon blue"><i class="bi bi-collection"></i></div>
               </div>
@@ -71,19 +71,10 @@
             <div class="admin-card">
               <div class="admin-card-header">
                 <div>
-                  <div class="admin-card-value" id="statApproved">0</div>
-                  <div class="admin-card-label">Approved</div>
+                  <div class="admin-card-value" id="statArchived">0</div>
+                  <div class="admin-card-label">Archived</div>
                 </div>
-                <div class="admin-card-icon green"><i class="bi bi-check-circle"></i></div>
-              </div>
-            </div>
-            <div class="admin-card">
-              <div class="admin-card-header">
-                <div>
-                  <div class="admin-card-value" id="statPending">0</div>
-                  <div class="admin-card-label">Pending</div>
-                </div>
-                <div class="admin-card-icon gold"><i class="bi bi-clock"></i></div>
+                <div class="admin-card-icon gold"><i class="bi bi-archive"></i></div>
               </div>
             </div>
             <div class="admin-card">
@@ -92,7 +83,16 @@
                   <div class="admin-card-value" id="statUsers">0</div>
                   <div class="admin-card-label">Total Users</div>
                 </div>
-                <div class="admin-card-icon blue"><i class="bi bi-people"></i></div>
+                <div class="admin-card-icon green"><i class="bi bi-people"></i></div>
+              </div>
+            </div>
+            <div class="admin-card">
+              <div class="admin-card-header">
+                <div>
+                  <div class="admin-card-value" id="statDownloads">0</div>
+                  <div class="admin-card-label">Downloads</div>
+                </div>
+                <div class="admin-card-icon blue"><i class="bi bi-download"></i></div>
               </div>
             </div>
           </div>
@@ -110,8 +110,8 @@
                       <tr>
                         <th>Title</th>
                         <th>Year</th>
-                        <th>Status</th>
-                        <th>Date</th>
+                        <th>Adviser</th>
+                        <th>Date Added</th>
                       </tr>
                     </thead>
                     <tbody id="recentCapstones">
@@ -407,17 +407,16 @@
           const data = await capstonesRes.json();
           allCapstones = data.data || [];
           
-          document.getElementById('statTotalProjects').textContent = allCapstones.length;
-          document.getElementById('statApproved').textContent = allCapstones.filter(c => c.status === 'approved').length;
-          document.getElementById('statPending').textContent = allCapstones.filter(c => c.status === 'pending').length;
+          document.getElementById('statTotalProjects').textContent = allCapstones.filter(c => !c.isDeleted).length;
+          document.getElementById('statArchived').textContent = allCapstones.filter(c => c.isDeleted).length;
           
           // Render recent capstones
-          const recent = allCapstones.slice(0, 5);
+          const recent = allCapstones.filter(c => !c.isDeleted).slice(0, 5);
           document.getElementById('recentCapstones').innerHTML = recent.length ? recent.map(c => `
             <tr>
               <td>${c.title || 'Untitled'}</td>
               <td>${c.year || 'N/A'}</td>
-              <td><span class="status-badge ${c.status}">${c.status || 'pending'}</span></td>
+              <td>${c.adviser || 'N/A'}</td>
               <td>${c.createdAt ? new Date(c.createdAt).toLocaleDateString() : 'N/A'}</td>
             </tr>
           `).join('') : '<tr><td colspan="4" class="text-center text-muted">No capstones yet</td></tr>';
@@ -444,6 +443,7 @@
           document.getElementById('analyticsDownloads').textContent = data.capstones?.downloads || 0;
           document.getElementById('analyticsSiteVisits').textContent = data.users?.visits || 0;
           document.getElementById('analyticsActiveUsers').textContent = data.users?.active || 0;
+          document.getElementById('statDownloads').textContent = data.capstones?.downloads || 0;
         }
       } catch (err) {
         console.error('Error loading dashboard:', err);
