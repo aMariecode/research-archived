@@ -706,17 +706,10 @@
           <td><strong>${u.fullName || 'Unknown'}</strong></td>
           <td>${u.email || 'N/A'}</td>
           <td><span class="status-badge ${u.role === 'Admin' ? 'approved' : 'pending'}">${u.role || 'Viewer'}</span></td>
-          <td><span class="status-badge ${u.isDisabled ? 'rejected' : 'approved'}">${u.isDisabled ? 'Disabled' : 'Active'}</span></td>
+          <td><span class="status-badge approved">Active</span></td>
           <td>
             <div class="d-flex gap-1">
-              ${u.role !== 'Admin' ? `
-                <button class="btn btn-outline-primary btn-sm" onclick="promoteUser('${u._id}')" title="Make Admin">
-                  <i class="bi bi-arrow-up"></i>
-                </button>
-              ` : ''}
-              <button class="btn btn-outline-${u.isDisabled ? 'success' : 'warning'} btn-sm" onclick="toggleUser('${u._id}', ${!u.isDisabled})" title="${u.isDisabled ? 'Enable' : 'Disable'}">
-                <i class="bi bi-${u.isDisabled ? 'check' : 'slash'}-circle"></i>
-              </button>
+              <span class="text-muted">—</span>
             </div>
           </td>
         </tr>
