@@ -77,7 +77,10 @@
           
           <div class="form-group">
             <label for="loginPassword">Password</label>
-            <input type="password" id="loginPassword" class="form-control" placeholder="Enter your password">
+            <div class="password-wrapper">
+              <input type="password" id="loginPassword" class="form-control" placeholder="Enter your password">
+              <i class="bi bi-eye-slash password-toggle" onclick="togglePassword('loginPassword', this)"></i>
+            </div>
           </div>
           
           <button id="loginBtn" class="btn btn-primary w-100 btn-lg" onclick="doLogin()">
@@ -110,7 +113,10 @@
           
           <div class="form-group">
             <label for="regPassword">Password</label>
-            <input type="password" id="regPassword" class="form-control" placeholder="Create a password">
+            <div class="password-wrapper">
+              <input type="password" id="regPassword" class="form-control" placeholder="Create a password">
+              <i class="bi bi-eye-slash password-toggle" onclick="togglePassword('regPassword', this)"></i>
+            </div>
           </div>
           
           <button id="registerBtn" class="btn btn-success w-100 btn-lg" onclick="doRegister()">
@@ -243,6 +249,20 @@
     document.getElementById('regPassword').addEventListener('keypress', (e) => {
       if (e.key === 'Enter') doRegister();
     });
+
+    // Toggle password visibility
+    function togglePassword(inputId, icon) {
+      const input = document.getElementById(inputId);
+      if (input.type === 'password') {
+        input.type = 'text';
+        icon.classList.remove('bi-eye-slash');
+        icon.classList.add('bi-eye');
+      } else {
+        input.type = 'password';
+        icon.classList.remove('bi-eye');
+        icon.classList.add('bi-eye-slash');
+      }
+    }
     
     // Check if already logged in
     const token = localStorage.getItem('accessToken');

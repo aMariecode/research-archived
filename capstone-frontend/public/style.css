@@ -667,6 +667,28 @@ body {
   margin-bottom: 0.6rem;
 }
 
+.password-wrapper {
+  position: relative;
+}
+
+.password-wrapper .form-control {
+  padding-right: 45px;
+}
+
+.password-toggle {
+  position: absolute;
+  right: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  color: var(--gray-500);
+  font-size: 1.1rem;
+}
+
+.password-toggle:hover {
+  color: var(--primary);
+}
+
 .form-control {
   width: 100%;
   padding: 0.85rem 1rem;
