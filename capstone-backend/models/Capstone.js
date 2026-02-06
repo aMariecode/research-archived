@@ -16,7 +16,13 @@ const capstoneSchema = new mongoose.Schema(
       trim: true,
       maxlength: [5000, "Abstract cannot exceed 5000 characters"],
     },
-    // previewImage removed as per request
+    previewImage: {
+      type: {
+        url: { type: String, trim: true, default: '' },
+        publicId: { type: String, trim: true, default: '' }
+      },
+      default: null
+    },
     members: {
       type: [String],
       default: [],
