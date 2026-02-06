@@ -390,7 +390,29 @@ exports.updateCapstone = async (req, res) => {
             capstone.year = yearNum;
         }
 
-        // previewImage removed
+
+        // Handle preview image update
+        if (req.files?.previewImage?.[0]) {
+            // Delete old image if exists
+            if (capstone.previewImage?.publicId) {
+                try {
+                    await deleteFromCloudinary(capstone.previewImage.publicId, "image");
+                } catch (err) {
+                    console.error("Error deleting old preview image:", err);
+                }
+            }
+            try {
+                const previewImageResult = await uploadToCloudinary(
+                    req.files.previewImage[0].buffer,
+                    "images",
+                    "image",
+                    req.files.previewImage[0].originalname
+                );
+                capstone.previewImage = previewImageResult;
+            } catch (err) {
+                console.error("Preview image upload failed (update):", err);
+            }
+        }
 
         if (req.files?.pdfFile?.[0]) {
             if (capstone.pdfPublicId) {
