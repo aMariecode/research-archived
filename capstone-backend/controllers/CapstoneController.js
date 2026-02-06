@@ -187,6 +187,21 @@ exports.addCapstone = async (req, res) => {
             });
         }
 
+        // Optional preview image upload
+        let previewImageResult = null;
+        if (req.files.previewImage && req.files.previewImage[0]) {
+            try {
+                previewImageResult = await uploadToCloudinary(
+                    req.files.previewImage[0].buffer,
+                    'images',
+                    'image',
+                    req.files.previewImage[0].originalname
+                );
+            } catch (err) {
+                console.error('Preview image upload failed:', err);
+            }
+        }
+
         // Validate year
         const yearNum = parseInt(year);
         const now = new Date().getFullYear();
@@ -245,16 +260,17 @@ exports.addCapstone = async (req, res) => {
         const newCapstone = new Capstone({
             title,
             abstract,
-            members: parsedMembers, // Fixed typo
+            members: parsedMembers,
             adviser: adviser || '',
             year: yearNum,
             technologies: parsedTechnologies,
             pdfUrl: pdfResult.url,
             pdfPublicId: pdfResult.public_id,
             githubUrl: githubUrl || '',
-            createdBy: req.user.id, // Important!
+            createdBy: req.user.id,
             isApproved: true,
-            status: 'approved'
+            status: 'approved',
+            previewImage: previewImageResult
         });
 
         await newCapstone.save();

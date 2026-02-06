@@ -290,6 +290,21 @@ body {
   padding: 0.75rem 2rem;
 }
 
+@media (max-width: 600px) {
+  .hero-search {
+    flex-direction: column;
+    gap: 0.5rem;
+    align-items: stretch;
+  }
+  .hero-search button {
+    width: 100%;
+    padding: 0.75rem 1rem;
+  }
+  .hero-search input {
+    width: 100%;
+  }
+}
+
 .hero-stats {
   display: flex;
   justify-content: center;
