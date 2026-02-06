@@ -177,6 +177,7 @@
           </div>
         </div>
 
+
         <!-- Users Section -->
         <div id="usersSection" style="display:none">
           <div class="admin-panel">
@@ -317,7 +318,32 @@
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
   <script>
+  console.log('SCRIPT LOADED');
+  // Delete user (archive) - must be global for onclick// not working
+  window.deleteUser = async function(id, name) {
+    console.log('deleteUser called for', id, name);
+    if (!confirm(`Are you sure you want to delete user '${name}'?`)) return;
+    const token = getToken();
+    try {
+      const res = await fetch(`${BACKEND}/admin/user/archive/${id}`, {
+        method: 'PATCH',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (res.ok) {
+        alert('User deleted successfully.');
+        loadUsers();
+      } else {
+        const data = await res.json();
+        alert(data.message || 'Failed to delete user.');
+        console.error('Delete user failed:', data);
+      }
+    } catch (err) {
+      alert('Network error. Please try again.');
+      console.error('Delete user network error:', err);
+    }
+  }
     const BACKEND = `https://research-archived.onrender.com/api`;
     let allCapstones = [];
     let filteredCapstones = [];
@@ -706,26 +732,7 @@
           </td>
         </tr>
       `).join('');
-        // Delete user (archive)
-        async function deleteUser(id, name) {
-          if (!confirm(`Are you sure you want to delete user '${name}'?`)) return;
-          const token = getToken();
-          try {
-            const res = await fetch(`${BACKEND}/admin/user/archive/${id}`, {
-              method: 'PATCH',
-              headers: { 'Authorization': `Bearer ${token}` }
-            });
-            if (res.ok) {
-              alert('User deleted successfully.');
-              loadUsers();
-            } else {
-              const data = await res.json();
-              alert(data.message || 'Failed to delete user.');
-            }
-          } catch (err) {
-            alert('Network error. Please try again.');
-          }
-        }
+
     }
 
     // Promote user to admin
