@@ -699,11 +699,33 @@
           <td><span class="status-badge approved">Active</span></td>
           <td>
             <div class="d-flex gap-1">
-              <span class="text-muted">—</span>
+              <button class="btn btn-outline-danger btn-sm" title="Delete User" onclick="deleteUser('${u._id}', '${u.fullName || ''}')">
+                <i class="bi bi-trash"></i>
+              </button>
             </div>
           </td>
         </tr>
       `).join('');
+        // Delete user (archive)
+        async function deleteUser(id, name) {
+          if (!confirm(`Are you sure you want to delete user '${name}'?`)) return;
+          const token = getToken();
+          try {
+            const res = await fetch(`${BACKEND}/admin/user/archive/${id}`, {
+              method: 'PATCH',
+              headers: { 'Authorization': `Bearer ${token}` }
+            });
+            if (res.ok) {
+              alert('User deleted successfully.');
+              loadUsers();
+            } else {
+              const data = await res.json();
+              alert(data.message || 'Failed to delete user.');
+            }
+          } catch (err) {
+            alert('Network error. Please try again.');
+          }
+        }
     }
 
     // Promote user to admin
