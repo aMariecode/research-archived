@@ -33,7 +33,7 @@
 
     <!-- Main Content -->
     <main class="admin-main" style="position: relative;">
-      <img src="CITNEWLOGO.png" alt="CIT Logo Background" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); opacity: 0.07; z-index: 0; width: 60%; max-width: 600px; pointer-events: none;">
+      <img src="CITNEWLOGO.png" alt="CIT Logo Background" style="position: absolute; top: 55%; left: 50%; transform: translate(-50%, -50%); opacity: 0.06; z-index: 0; width: 85%; max-width: 1100px; pointer-events: none;">
       <!-- Not Authorized -->
       <div id="notAuthorized" class="alert alert-warning" style="display:none">
         <i class="bi bi-exclamation-triangle"></i> You are not authorized to view this page. Please sign in with an admin account.
@@ -292,7 +292,8 @@
               <div class="col-md-6">
                 <div class="form-group">
                   <label>Preview Image</label>
-                  <input type="file" class="form-control" id="capImage" accept="image/*">
+                  <input type="file" class="form-control" id="capImage" accept="image/*" onchange="showPreviewImage(event)">
+                  <div id="previewImageContainer" style="margin-top: 8px;"></div>
                 </div>
               </div>
               <div class="col-md-6">
@@ -619,18 +620,15 @@
       
       // Show current file info if they exist
       const previewFileLabel = document.querySelector('label[for="capImage"]');
-      const pdfFileLabel = document.querySelector('label[for="capPdf"]');
-      
+      const previewImageContainer = document.getElementById('previewImageContainer');
       if (previewFileLabel && capstone.previewImage?.url) {
         previewFileLabel.textContent = '📄 Preview Image (Current: exists)';
+        if (previewImageContainer) {
+          previewImageContainer.innerHTML = `<img src="${capstone.previewImage.url}" alt="Preview Image" style="max-width:100%;max-height:120px;display:block;margin-top:4px;" />`;
+        }
       } else if (previewFileLabel) {
         previewFileLabel.textContent = 'Preview Image';
-      }
-      
-      if (pdfFileLabel && capstone.pdfUrl) {
-        pdfFileLabel.textContent = '📑 PDF File (Current: exists)';
-      } else if (pdfFileLabel) {
-        pdfFileLabel.textContent = 'PDF File';
+        if (previewImageContainer) previewImageContainer.innerHTML = '';
       }
       
       new bootstrap.Modal(document.getElementById('capstoneModal')).show();
