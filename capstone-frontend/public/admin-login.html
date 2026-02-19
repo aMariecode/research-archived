@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="login-container">
+        <h2>Admin Login</h2>
+        <form id="admin-login-form" action="/api/admin/login" method="POST">
+            <label for="admin-username">Username</label>
+            <input type="text" id="admin-username" name="username" required>
+
+            <label for="admin-password">Password</label>
+            <input type="password" id="admin-password" name="password" required>
+
+                <!-- Google reCAPTCHA widget -->
+                <div class="g-recaptcha" data-sitekey="YOUR_RECAPTCHA_SITE_KEY"></div>
+
+            <button type="submit">Login</button>
+        </form>
+        <a href="login.html">Back to User Login</a>
+    </div>
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+</body>
+</body>
+<script>
+document.getElementById('admin-login-form').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const username = document.getElementById('admin-username').value;
+    const password = document.getElementById('admin-password').value;
+    const recaptchaToken = grecaptcha.getResponse();
+    if (!recaptchaToken) {
+        alert('Please complete the reCAPTCHA.');
+        return;
+    }
+    try {
+        const res = await fetch('/api/admin/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username, password, recaptchaToken })
+        });
+        const data = await res.json();
+        if (!res.ok) {
+            alert(data.message || 'Login failed');
+        } else {
+            alert('Login successful!');
+            // Redirect as needed
+        }
+    } catch (err) {
+        alert('Network error. Please try again.');
+    }
+});
+</script>
+</html>
