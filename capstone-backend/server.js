@@ -80,7 +80,6 @@ app.use("/api/auth", require("./routes/AuthRoutes.js"));
 app.use("/api", require("./routes/SearchRoutes.js"));
 app.use("/api/capstone", require("./routes/CapstoneRoutes.js"));
 app.use("/api/admin", require("./routes/AdminRoutes.js"));
-app.use("/api/admin", require("./routes/AdminLoginRoutes.js"));
 app.use("/api/user", require("./routes/UserRoutes.js"));
 app.use("/api/admin/analytics", require("./routes/AnalyticsRoutes.js"));
 
