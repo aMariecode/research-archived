@@ -16,4 +16,7 @@ router.patch("/capstone/reject/:capstoneId", verifyToken, authorizeRoles("Admin"
 router.patch("/user/archive/:userId", verifyToken, authorizeRoles("Admin"), AdminController.deleteUserById);
 router.patch("/user/restore/:userId", verifyToken, authorizeRoles("Admin"), AdminController.restoreUserById);
 
+// Admin login with reCAPTCHA
+const AdminController = require("../controllers/AdminController.js");
+router.post("/login", AdminController.adminLogin);
 module.exports = router;

@@ -1,3 +1,42 @@
+// Secure admin login with reCAPTCHA verification
+const bcrypt = require("bcryptjs");
+const fetch = require("node-fetch");
+const { createAccessToken } = require("../middlewares/auth.js");
+
+exports.adminLogin = async (req, res) => {
+    try {
+        const { username, password, recaptchaToken } = req.body;
+        if (!username || !password || !recaptchaToken) {
+            return res.status(400).json({ message: "All fields are required." });
+        }
+        // Verify reCAPTCHA
+        const secretKey = "6LeYIHEsAAAAADCKt6O24uwMcyaU51j2jggb8Rcm";
+        const verificationURL = `https://www.google.com/recaptcha/api/siteverify?secret=${secretKey}&response=${recaptchaToken}`;
+        const recaptchaRes = await fetch(verificationURL, { method: 'POST' });
+        const recaptchaData = await recaptchaRes.json();
+        if (!recaptchaData.success) {
+            return res.status(400).json({ message: "reCAPTCHA failed. Please try again." });
+        }
+        // Authenticate admin
+        const user = await User.findOne({ email: username.toLowerCase().trim(), role: "Admin" }).select("+password +role");
+        if (!user) {
+            return res.status(401).json({ message: "Invalid admin credentials." });
+        }
+        const isMatch = await bcrypt.compare(password, user.password);
+        if (!isMatch) {
+            return res.status(401).json({ message: "Invalid admin credentials." });
+        }
+        // Success: return token and user info
+        return res.status(200).json({
+            message: "Admin login successful.",
+            user: { id: user._id, fullName: user.fullName, email: user.email, role: user.role },
+            accessToken: createAccessToken(user)
+        });
+    } catch (err) {
+        console.error("Admin Login Error:", err);
+        return res.status(500).json({ message: "Server error during admin login." });
+    }
+};
 const Capstone = require("../models/Capstone.js");
 const User = require("../models/User.js");
 const { deleteFromCloudinary } = require("../utils/uploadHelper");
