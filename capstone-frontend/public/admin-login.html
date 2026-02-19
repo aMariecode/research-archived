@@ -11,110 +11,111 @@
 <body>
 
     <!-- Admin padlock button top-right -->
-    <div style="position: absolute; top: 20px; right: 30px; z-index: 1000;">
-        <button class="btn btn-light shadow" style="border-radius:50%;padding:0.5rem 0.7rem;font-size:1.7rem;" onclick="window.location.href='login.html'" title="Back to User Login">
-            <i class="bi bi-arrow-left"></i>
-        </button>
-    </div>
-    <div class="auth-page">
-        <!-- Left Side - Branding -->
-        <div class="auth-left">
-            <div class="auth-logo">
-                <img src="ua-seal.png" alt="University of the Assumption" class="auth-logo-image">
-                <div>
-                    <h1 style="font-size: 2rem; margin: 0; font-weight: 700;">University of the Assumption</h1>
-                    <span style="opacity: 0.85; font-size: 0.9rem;">College of Information Technology</span>
-                </div>
-            </div>
-            <h1>Admin Portal<br>UA Capstone Library</h1>
-            <p>Admins can securely manage capstone projects, users, and analytics. Please log in to access admin features.</p>
-            <div class="auth-features">
-                <div class="auth-feature">
-                    <div class="auth-feature-icon">
-                        <i class="bi bi-shield-lock"></i>
-                    </div>
-                    <div>
-                        <h4>Secure Access</h4>
-                        <p>Only authorized admins can log in here</p>
-                    </div>
-                </div>
-                <div class="auth-feature">
-                    <div class="auth-feature-icon">
-                        <i class="bi bi-bar-chart"></i>
-                    </div>
-                    <div>
-                        <h4>Manage & Analyze</h4>
-                        <p>View analytics and manage users/projects</p>
-                    </div>
-                </div>
-            </div>
+        <!-- Admin padlock button top-right -->
+        <div style="position: absolute; top: 20px; right: 30px; z-index: 1000;">
+                <button class="btn btn-light shadow" style="border-radius:50%;padding:0.5rem 0.7rem;font-size:1.7rem;" onclick="window.location.href='login.html'" title="Back to User Login">
+                        <i class="bi bi-arrow-left"></i>
+                </button>
         </div>
-        <!-- Right Side - Admin Auth Form -->
-        <div class="auth-right">
-            <div class="auth-form-container">
-                <h2>Admin Login</h2>
-                <p class="subtitle">Sign in with your admin credentials</p>
-                <form id="admin-login-form" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
-                    <div class="form-group mb-3">
-                        <label for="admin-username">Username</label>
-                        <input type="text" id="admin-username" name="username" class="form-control" required autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
-                    </div>
-                    <div class="form-group mb-3">
-                        <label for="admin-password">Password</label>
-                        <div class="password-wrapper">
-                            <input type="password" id="admin-password" name="password" class="form-control" required autocomplete="new-password" autocorrect="off" autocapitalize="off" spellcheck="false">
-                            <i class="bi bi-eye-slash password-toggle" onclick="togglePassword('admin-password', this)"></i>
+        <div class="auth-page">
+                <!-- Left Side - Branding -->
+                <div class="auth-left">
+                        <div class="auth-logo">
+                                <img src="ua-seal.png" alt="University of the Assumption" class="auth-logo-image">
+                                <div>
+                                        <h1 style="font-size: 2rem; margin: 0; font-weight: 700;">University of the Assumption</h1>
+                                        <span style="opacity: 0.85; font-size: 0.9rem;">College of Information Technology</span>
+                                </div>
                         </div>
-                    </div>
-                    <div class="form-group mt-3 mb-2">
-                        <div class="g-recaptcha" data-sitekey="YOUR_RECAPTCHA_SITE_KEY"></div>
-                    </div>
-                    <button type="submit" class="btn btn-danger w-100 btn-lg mt-2">Login</button>
-                </form>
-            </div>
+                        <h1>Admin Portal<br>UA Capstone Library</h1>
+                        <p>Admins can securely manage capstone projects, users, and analytics. Please log in to access admin features.</p>
+                        <div class="auth-features">
+                                <div class="auth-feature">
+                                        <div class="auth-feature-icon">
+                                                <i class="bi bi-shield-lock"></i>
+                                        </div>
+                                        <div>
+                                                <h4>Secure Access</h4>
+                                                <p>Only authorized admins can log in here</p>
+                                        </div>
+                                </div>
+                                <div class="auth-feature">
+                                        <div class="auth-feature-icon">
+                                                <i class="bi bi-bar-chart"></i>
+                                        </div>
+                                        <div>
+                                                <h4>Manage & Analyze</h4>
+                                                <p>View analytics and manage users/projects</p>
+                                        </div>
+                                </div>
+                        </div>
+                </div>
+                <!-- Right Side - Admin Auth Form -->
+                <div class="auth-right">
+                        <div class="auth-form-container">
+                                <h2>Admin Login</h2>
+                                <p class="subtitle">Sign in with your admin credentials</p>
+                                <form id="admin-login-form" action="/api/admin/login" method="POST">
+                                        <div class="form-group">
+                                                <label for="admin-username">Username</label>
+                                                <input type="text" id="admin-username" name="username" class="form-control" required>
+                                        </div>
+                                        <div class="form-group">
+                                                <label for="admin-password">Password</label>
+                                                <div class="password-wrapper">
+                                                        <input type="password" id="admin-password" name="password" class="form-control" required>
+                                                        <i class="bi bi-eye-slash password-toggle" onclick="togglePassword('admin-password', this)"></i>
+                                                </div>
+                                        </div>
+                                        <div class="form-group mt-3 mb-2">
+                                                <div class="g-recaptcha" data-sitekey="YOUR_RECAPTCHA_SITE_KEY"></div>
+                                        </div>
+                                        <button type="submit" class="btn btn-danger w-100 btn-lg mt-2">Login</button>
+                                </form>
+                        </div>
+                </div>
         </div>
-    </div>
-    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        function togglePassword(inputId, icon) {
-            const input = document.getElementById(inputId);
-            if (input.type === 'password') {
-                input.type = 'text';
-                icon.classList.remove('bi-eye-slash');
-                icon.classList.add('bi-eye');
-            } else {
-                input.type = 'password';
-                icon.classList.remove('bi-eye');
-                icon.classList.add('bi-eye-slash');
-            }
-        }
-        document.getElementById('admin-login-form').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            const username = document.getElementById('admin-username').value;
-            const password = document.getElementById('admin-password').value;
-            const recaptchaToken = grecaptcha.getResponse();
-            if (!recaptchaToken) {
-                alert('Please complete the reCAPTCHA.');
-                return;
-            }
-            try {
-                const res = await fetch('/api/admin/login', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ username, password, recaptchaToken })
-                });
-                const data = await res.json();
-                if (!res.ok) {
-                    alert(data.message || 'Login failed');
-                } else {
-                    alert('Login successful!');
-                    // Redirect as needed
+        <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+        <script>
+                function togglePassword(inputId, icon) {
+                        const input = document.getElementById(inputId);
+                        if (input.type === 'password') {
+                                input.type = 'text';
+                                icon.classList.remove('bi-eye-slash');
+                                icon.classList.add('bi-eye');
+                        } else {
+                                input.type = 'password';
+                                icon.classList.remove('bi-eye');
+                                icon.classList.add('bi-eye-slash');
+                        }
                 }
-            } catch (err) {
-                alert('Network error. Please try again.');
-            }
-        });
-    </script>
+                document.getElementById('admin-login-form').addEventListener('submit', async function(e) {
+                        e.preventDefault();
+                        const username = document.getElementById('admin-username').value;
+                        const password = document.getElementById('admin-password').value;
+                        const recaptchaToken = grecaptcha.getResponse();
+                        if (!recaptchaToken) {
+                                alert('Please complete the reCAPTCHA.');
+                                return;
+                        }
+                        try {
+                                const res = await fetch('/api/admin/login', {
+                                        method: 'POST',
+                                        headers: { 'Content-Type': 'application/json' },
+                                        body: JSON.stringify({ username, password, recaptchaToken })
+                                });
+                                const data = await res.json();
+                                if (!res.ok) {
+                                        alert(data.message || 'Login failed');
+                                } else {
+                                        alert('Login successful!');
+                                        // Redirect as needed
+                                }
+                        } catch (err) {
+                                alert('Network error. Please try again.');
+                        }
+                });
+        </script>
 </body>
 </html>
