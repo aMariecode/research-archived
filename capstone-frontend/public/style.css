@@ -1,3 +1,21 @@
+.auth-right input[type="email"],
+.auth-right input[type="text"],
+.auth-right input[type="password"] {
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+  background-color: var(--gray-100) !important;
+}
+.auth-right input:-webkit-autofill,
+.auth-right input:-webkit-autofill:focus,
+.auth-right input:-webkit-autofill:active {
+  border: none !important;
+  outline: none !important;
+  box-shadow: 0 0 0 30px var(--gray-100) inset !important;
+  -webkit-box-shadow: 0 0 0 30px var(--gray-100) inset !important;
+  background-color: var(--gray-100) !important;
+  color: var(--dark) !important;
+}
 .auth-right input[type="text"],
 .auth-right input[type="password"] {
   border: none !important;
@@ -33,7 +51,19 @@
   outline: none !important;
   box-shadow: none !important;
 }
+.auth-right input[type="text"].is-invalid,
+.auth-right input[type="password"].is-invalid {
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
 /* Remove red border from admin-login inputs */
+.auth-right input[type="text"],
+.auth-right input[type="password"] {
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
 /* ============================================
    UA Research Archive - Modern Library Theme
    ============================================ */
@@ -293,9 +323,9 @@ body {
 .hero h1 {
   font-size: 2.5rem;
   font-weight: 700;
-  border: none !important;
-  outline: none !important;
-  box-shadow: none !important;
+  margin-bottom: 1rem;
+}
+
 .hero p {
   font-size: 1.1rem;
   opacity: 0.9;
