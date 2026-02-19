@@ -9,7 +9,6 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
 </head>
 <body>
-
     <!-- Admin padlock button top-right -->
     <div style="position: absolute; top: 20px; right: 30px; z-index: 1000;">
         <button class="btn btn-light shadow" style="border-radius:50%;padding:0.5rem 0.7rem;font-size:1.7rem;" onclick="window.location.href='login.html'" title="Back to User Login">
@@ -54,18 +53,21 @@
             <div class="auth-form-container">
                 <h2>Admin Login</h2>
                 <p class="subtitle">Sign in with your admin credentials</p>
-                <form id="admin-login-form" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
-                    <div class="form-group mb-3">
-                        <label for="admin-username">Username</label>
-                        <input type="text" id="admin-username" name="username" class="form-control" required autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
-                    </div>
-                    <div class="form-group mb-3">
-                        <label for="admin-password">Password</label>
-                        <div class="password-wrapper">
-                            <input type="password" id="admin-password" name="password" class="form-control" required autocomplete="new-password" autocorrect="off" autocapitalize="off" spellcheck="false">
-                            <i class="bi bi-eye-slash password-toggle" onclick="togglePassword('admin-password', this)"></i>
-                        </div>
-                    </div>
+                <form id="admin-login-form" action="/api/admin/login" method="POST">
+                    <form id="admin-login-form" action="/api/admin/login" method="POST" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+                        <form autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+                            <div class="form-group mb-3">
+                                <label for="admin-username">Username</label>
+                                <input type="text" id="admin-username" name="username" class="form-control" required autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+                            </div>
+                            <div class="form-group mb-3">
+                                <label for="admin-password">Password</label>
+                                <div class="password-wrapper">
+                                    <input type="password" id="admin-password" name="password" class="form-control" required autocomplete="new-password" autocorrect="off" autocapitalize="off" spellcheck="false">
+                                    <i class="bi bi-eye-slash password-toggle" onclick="togglePassword('admin-password', this)"></i>
+                                </div>
+                            </div>
+                        </form>
                     <div class="form-group mt-3 mb-2">
                         <div class="g-recaptcha" data-sitekey="YOUR_RECAPTCHA_SITE_KEY"></div>
                     </div>

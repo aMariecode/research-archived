@@ -74,6 +74,7 @@
         
         <!-- Login Form -->
         <div id="loginForm">
+          <div id="loginError" class="form-error" style="display:none"></div>
           
           <form autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
             <div class="form-group mb-3">
@@ -99,6 +100,7 @@
         
         <!-- Register Form -->
         <div id="registerForm" style="display:none">
+          <div id="regError" class="form-error" style="display:none"></div>
           
           <form autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
             <div class="form-group mb-3">
@@ -144,15 +146,26 @@
       document.getElementById('registerForm').style.display = tab === 'register' ? 'block' : 'none';
       document.getElementById('loginTabBtn').classList.toggle('active', tab === 'login');
       document.getElementById('registerTabBtn').classList.toggle('active', tab === 'register');
+      // Clear errors
+      document.getElementById('loginError').style.display = 'none';
+      document.getElementById('regError').style.display = 'none';
+    }
+    
+    function showError(id, msg) {
+      const el = document.getElementById(id);
+      if (!msg) { el.style.display = 'none'; return; }
+      el.textContent = msg;
+      el.style.display = 'block';
     }
     
     // Login
     async function doLogin() {
-      // No error display
+      showError('loginError', '');
       const email = document.getElementById('loginEmail').value.trim();
       const password = document.getElementById('loginPassword').value;
       
       if (!email || !password) {
+        showError('loginError', 'Please enter email and password');
         return;
       }
       
@@ -163,28 +176,41 @@
           body: JSON.stringify({ email, password })
         });
         const body = await res.json();
-        if (!res.ok) return;
+        
+        if (!res.ok) {
+          showError('loginError', body.message || 'Login failed');
+          return;
+        }
+        
         const token = body.accessToken || body.token;
-        if (!token || token === 'undefined' || token === 'null') return;
+        if (!token || token === 'undefined' || token === 'null') {
+          showError('loginError', 'Login failed: missing access token');
+          return;
+        }
+
         localStorage.setItem('accessToken', token);
         localStorage.setItem('user', JSON.stringify(body.user));
+        
         // Redirect based on role
         if (body.user.role === 'Admin') {
           window.location.href = '/admin.html';
         } else {
           window.location.href = '/index.html';
         }
-      } catch (err) {}
+      } catch (err) {
+        showError('loginError', 'Network error. Please try again.');
+      }
     }
     
     // Register
     async function doRegister() {
-      // No error display
+      showError('regError', '');
       const fullName = document.getElementById('regName').value.trim();
       const email = document.getElementById('regEmail').value.trim();
       const password = document.getElementById('regPassword').value;
       
       if (!fullName || !email || !password) {
+        showError('regError', 'Please fill in all required fields');
         return;
       }
       
@@ -195,18 +221,30 @@
           body: JSON.stringify({ fullName, email, password })
         });
         const body = await res.json();
-        if (!res.ok) return;
+        
+        if (!res.ok) {
+          showError('regError', body.message || 'Registration failed');
+          return;
+        }
+        
         const token = body.accessToken || body.token;
-        if (!token || token === 'undefined' || token === 'null') return;
+        if (!token || token === 'undefined' || token === 'null') {
+          showError('regError', 'Registration failed: missing access token');
+          return;
+        }
+
         localStorage.setItem('accessToken', token);
         localStorage.setItem('user', JSON.stringify(body.user));
+        
         // Redirect based on role
         if (body.user.role === 'Admin') {
           window.location.href = '/admin.html';
         } else {
           window.location.href = '/index.html';
         }
-      } catch (err) {}
+      } catch (err) {
+        showError('regError', 'Network error. Please try again.');
+      }
     }
     
     // Enter key handlers
