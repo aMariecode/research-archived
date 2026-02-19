@@ -9,12 +9,6 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
 </head>
 <body>
-  <!-- Admin padlock button top-right -->
-  <div style="position: absolute; top: 20px; right: 30px; z-index: 1000;">
-    <button class="btn btn-light shadow" style="border-radius:50%;padding:0.5rem 0.7rem;font-size:1.7rem;" onclick="window.location.href='admin-login.html'" title="Admin Login">
-      <i class="bi bi-lock-fill"></i>
-    </button>
-  </div>
   <div class="auth-page">
     <!-- Left Side - Branding -->
     <div class="auth-left">
@@ -94,7 +88,13 @@
           </button>
 
             <button class="btn btn-outline-danger w-100 btn-lg mt-2" onclick="window.location.href='admin-login.html'">
-            <!-- Admin login button removed, only icon remains at top -->
+              <i class="bi bi-lock-fill"></i> Admin Login
+            </button>
+            <div class="d-flex justify-content-center mt-2">
+              <button class="btn btn-light" style="border-radius:50%;padding:0.5rem 0.7rem;font-size:1.5rem;" onclick="window.location.href='admin-login.html'" title="Admin Login">
+                <i class="bi bi-lock-fill"></i>
+              </button>
+            </div>
             </button>
           
           <div id="googleSignIn" class="d-flex justify-content-center">
