@@ -55,17 +55,19 @@
                 <p class="subtitle">Sign in with your admin credentials</p>
                 <form id="admin-login-form" action="/api/admin/login" method="POST">
                     <form id="admin-login-form" action="/api/admin/login" method="POST" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
-                        <div class="form-group">
-                            <label for="admin-username">Username</label>
-                            <input type="text" id="admin-username" name="username" required autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
-                        </div>
-                        <div class="form-group">
-                            <label for="admin-password">Password</label>
-                            <div class="password-wrapper">
-                                <input type="password" id="admin-password" name="password" required autocomplete="new-password" autocorrect="off" autocapitalize="off" spellcheck="false">
-                                <i class="bi bi-eye-slash password-toggle" onclick="togglePassword('admin-password', this)"></i>
+                        <form autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+                            <div class="form-group">
+                                <label for="admin-username">Username</label>
+                                <input type="text" id="admin-username" name="username" class="form-control" required autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
                             </div>
-                        </div>
+                            <div class="form-group">
+                                <label for="admin-password">Password</label>
+                                <div class="password-wrapper">
+                                    <input type="password" id="admin-password" name="password" class="form-control" required autocomplete="new-password" autocorrect="off" autocapitalize="off" spellcheck="false">
+                                    <i class="bi bi-eye-slash password-toggle" onclick="togglePassword('admin-password', this)"></i>
+                                </div>
+                            </div>
+                        </form>
                     <div class="form-group mt-3 mb-2">
                         <div class="g-recaptcha" data-sitekey="YOUR_RECAPTCHA_SITE_KEY"></div>
                     </div>

@@ -76,18 +76,19 @@
         <div id="loginForm">
           <div id="loginError" class="form-error" style="display:none"></div>
           
-          <div class="form-group">
-            <label for="loginEmail">Email Address</label>
-            <input type="email" id="loginEmail" placeholder="Enter your email" required autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
-          </div>
-          
-          <div class="form-group">
-            <label for="loginPassword">Password</label>
-            <div class="password-wrapper">
-              <input type="password" id="loginPassword" placeholder="Enter your password" required autocomplete="new-password" autocorrect="off" autocapitalize="off" spellcheck="false">
-              <i class="bi bi-eye-slash password-toggle" onclick="togglePassword('loginPassword', this)"></i>
+          <form autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+            <div class="form-group">
+              <label for="loginEmail">Email Address</label>
+              <input type="email" id="loginEmail" class="form-control" placeholder="Enter your email" required autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
             </div>
-          </div>
+            <div class="form-group">
+              <label for="loginPassword">Password</label>
+              <div class="password-wrapper">
+                <input type="password" id="loginPassword" class="form-control" placeholder="Enter your password" required autocomplete="new-password" autocorrect="off" autocapitalize="off" spellcheck="false">
+                <i class="bi bi-eye-slash password-toggle" onclick="togglePassword('loginPassword', this)"></i>
+              </div>
+            </div>
+          </form>
           
           <button id="loginBtn" class="btn btn-primary w-100 btn-lg" onclick="doLogin()">
             <i class="bi bi-box-arrow-in-right"></i> Sign In
@@ -106,28 +107,27 @@
         <div id="registerForm" style="display:none">
           <div id="regError" class="form-error" style="display:none"></div>
           
-          <div class="form-group">
-            <label for="regName">Full Name</label>
-            <input type="text" id="regName" placeholder="Enter your full name" required autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
-          </div>
-          
-          <div class="form-group">
-            <label for="regEmail">Email Address</label>
-            <input type="email" id="regEmail" placeholder="Enter your email" required autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
-          </div>
-          
-          <div class="form-group">
-            <label for="regSchool">School / Institution</label>
-            <input type="text" id="regSchool" placeholder="e.g., University of the Assumption" required autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
-          </div>
-          
-          <div class="form-group">
-            <label for="regPassword">Password</label>
-            <div class="password-wrapper">
-              <input type="password" id="regPassword" placeholder="Create a password" required autocomplete="new-password" autocorrect="off" autocapitalize="off" spellcheck="false">
-              <i class="bi bi-eye-slash password-toggle" onclick="togglePassword('regPassword', this)"></i>
+          <form autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+            <div class="form-group">
+              <label for="regName">Full Name</label>
+              <input type="text" id="regName" class="form-control" placeholder="Enter your full name" required autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
             </div>
-          </div>
+            <div class="form-group">
+              <label for="regEmail">Email Address</label>
+              <input type="email" id="regEmail" class="form-control" placeholder="Enter your email" required autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+            </div>
+            <div class="form-group">
+              <label for="regSchool">School / Institution</label>
+              <input type="text" id="regSchool" class="form-control" placeholder="e.g., University of the Assumption" required autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
+            </div>
+            <div class="form-group">
+              <label for="regPassword">Password</label>
+              <div class="password-wrapper">
+                <input type="password" id="regPassword" class="form-control" placeholder="Create a password" required autocomplete="new-password" autocorrect="off" autocapitalize="off" spellcheck="false">
+                <i class="bi bi-eye-slash password-toggle" onclick="togglePassword('regPassword', this)"></i>
+              </div>
+            </div>
+          </form>
           
           <button id="registerBtn" class="btn btn-success w-100 btn-lg" onclick="doRegister()">
             <i class="bi bi-person-plus"></i> Create Account
