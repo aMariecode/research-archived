@@ -18,7 +18,18 @@ exports.adminLogin = async (req, res) => {
             return res.status(400).json({ message: "reCAPTCHA failed. Please try again." });
         }
         // Authenticate admin
-        const user = await User.findOne({ email: username.toLowerCase().trim(), role: "Admin" }).select("+password +role");
+        // Allow login with either email or username
+        const user = await User.findOne({
+            $and: [
+                { role: "Admin" },
+                {
+                    $or: [
+                        { email: username.toLowerCase().trim() },
+                        { username: username }
+                    ]
+                }
+            ]
+        }).select("+password +role");
         if (!user) {
             return res.status(401).json({ message: "Invalid admin credentials." });
         }
