@@ -174,6 +174,9 @@
                   <tr><td colspan="4" class="text-center text-muted">Loading...</td></tr>
                 </tbody>
               </table>
+              <div id="capstonePagination" class="mt-3"></div>
+                </tbody>
+              </table>
             </div>
           </div>
         </div>
@@ -350,6 +353,9 @@
     let allCapstones = [];
     let filteredCapstones = [];
     let allUsers = [];
+  // Pagination variables for capstones
+  let capstoneCurrentPage = 1;
+  const capstonePageSize = 9;
 
     // Get token and user
     function getToken() {
@@ -509,19 +515,31 @@
         return true;
       });
       
+      capstoneCurrentPage = 1; // Reset to first page on filter
       renderCapstones();
     }
 
     // Render capstones table
     function renderCapstones() {
       const tbody = document.getElementById('capstoneTbody');
-      
+      const paginationDiv = document.getElementById('capstonePagination');
+      if (!paginationDiv) return;
+
       if (filteredCapstones.length === 0) {
         tbody.innerHTML = '<tr><td colspan="4" class="text-center text-muted">No capstones found</td></tr>';
+        paginationDiv.innerHTML = '';
         return;
       }
-      
-      tbody.innerHTML = filteredCapstones.map(c => `
+
+      // Pagination logic
+      const totalPages = Math.ceil(filteredCapstones.length / capstonePageSize);
+      if (capstoneCurrentPage > totalPages) capstoneCurrentPage = totalPages;
+      if (capstoneCurrentPage < 1) capstoneCurrentPage = 1;
+      const startIdx = (capstoneCurrentPage - 1) * capstonePageSize;
+      const endIdx = startIdx + capstonePageSize;
+      const pageCapstones = filteredCapstones.slice(startIdx, endIdx);
+
+      tbody.innerHTML = pageCapstones.map(c => `
         <tr>
           <td><strong>${c.title || 'Untitled'}</strong></td>
           <td>${(c.members || []).slice(0, 2).join(', ')}${c.members?.length > 2 ? '...' : ''}</td>
@@ -538,6 +556,25 @@
           </td>
         </tr>
       `).join('');
+
+      // Pagination controls
+      let paginationHtml = '';
+      if (totalPages > 1) {
+        paginationHtml += `<nav><ul class="pagination justify-content-center">`;
+        paginationHtml += `<li class="page-item${capstoneCurrentPage === 1 ? ' disabled' : ''}"><a class="page-link" href="#" onclick="changeCapstonePage(${capstoneCurrentPage - 1});return false;">Previous</a></li>`;
+        for (let i = 1; i <= totalPages; i++) {
+          paginationHtml += `<li class="page-item${capstoneCurrentPage === i ? ' active' : ''}"><a class="page-link" href="#" onclick="changeCapstonePage(${i});return false;">${i}</a></li>`;
+        }
+        paginationHtml += `<li class="page-item${capstoneCurrentPage === totalPages ? ' disabled' : ''}"><a class="page-link" href="#" onclick="changeCapstonePage(${capstoneCurrentPage + 1});return false;">Next</a></li>`;
+        paginationHtml += `</ul></nav>`;
+      }
+      paginationDiv.innerHTML = paginationHtml;
+    }
+
+    // Change page for capstones
+    window.changeCapstonePage = function(page) {
+      capstoneCurrentPage = page;
+      renderCapstones();
     }
 
     // Approve capstone

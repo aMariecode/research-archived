@@ -106,6 +106,8 @@
     <div class="projects-grid" id="projectsGrid">
       <!-- Project cards will be dynamically added -->
     </div>
+    <div id="projectsPagination" class="mt-4"></div>
+    </div>
     
     <div class="empty-state" id="emptyState" style="display:none">
       <div class="empty-state-icon"><i class="bi bi-inbox"></i></div>
@@ -168,6 +170,9 @@
     let filteredProjects = [];
     let currentYear = 'all';
     let currentProject = null;
+  // Pagination variables for projects
+  let projectCurrentPage = 1;
+  const projectPageSize = 9;
 
     // Check auth status
     function checkAuth() {
@@ -311,26 +316,37 @@
         }
       });
       
+      projectCurrentPage = 1; // Reset to first page on filter
       renderProjects();
     }
 
     // Render projects
     function renderProjects() {
       const grid = document.getElementById('projectsGrid');
+      const paginationDiv = document.getElementById('projectsPagination');
       const emptyState = document.getElementById('emptyState');
       const countEl = document.getElementById('projectsCount');
-      
+
       if (filteredProjects.length === 0) {
         grid.innerHTML = '';
+        if (paginationDiv) paginationDiv.innerHTML = '';
         emptyState.style.display = 'block';
         countEl.textContent = '0 projects';
         return;
       }
-      
+
       emptyState.style.display = 'none';
       countEl.textContent = `${filteredProjects.length} project${filteredProjects.length !== 1 ? 's' : ''}`;
-      
-      grid.innerHTML = filteredProjects.map(project => `
+
+      // Pagination logic
+      const totalPages = Math.ceil(filteredProjects.length / projectPageSize);
+      if (projectCurrentPage > totalPages) projectCurrentPage = totalPages;
+      if (projectCurrentPage < 1) projectCurrentPage = 1;
+      const startIdx = (projectCurrentPage - 1) * projectPageSize;
+      const endIdx = startIdx + projectPageSize;
+      const pageProjects = filteredProjects.slice(startIdx, endIdx);
+
+      grid.innerHTML = pageProjects.map(project => `
         <div class="project-card">
           <div class="project-card-image">
             ${project.previewImage?.url 
@@ -359,6 +375,25 @@
           </div>
         </div>
       `).join('');
+
+      // Pagination controls
+      let paginationHtml = '';
+      if (totalPages > 1) {
+        paginationHtml += `<nav><ul class="pagination justify-content-center">`;
+        paginationHtml += `<li class="page-item${projectCurrentPage === 1 ? ' disabled' : ''}"><a class="page-link" href="#" onclick="changeProjectPage(${projectCurrentPage - 1});return false;">Previous</a></li>`;
+        for (let i = 1; i <= totalPages; i++) {
+          paginationHtml += `<li class="page-item${projectCurrentPage === i ? ' active' : ''}"><a class="page-link" href="#" onclick="changeProjectPage(${i});return false;">${i}</a></li>`;
+        }
+        paginationHtml += `<li class="page-item${projectCurrentPage === totalPages ? ' disabled' : ''}"><a class="page-link" href="#" onclick="changeProjectPage(${projectCurrentPage + 1});return false;">Next</a></li>`;
+        paginationHtml += `</ul></nav>`;
+      }
+      if (paginationDiv) paginationDiv.innerHTML = paginationHtml;
+    }
+
+    // Change page for projects
+    window.changeProjectPage = function(page) {
+      projectCurrentPage = page;
+      renderProjects();
     }
 
     // View project details
