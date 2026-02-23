@@ -1,3 +1,4 @@
+
 const router = require("express").Router();
 const AdminController = require("../controllers/AdminController.js");
 const { verifyToken, authorizeRoles } = require("../middlewares/auth.js");
@@ -17,6 +18,5 @@ router.patch("/user/archive/:userId", verifyToken, authorizeRoles("Admin"), Admi
 router.patch("/user/restore/:userId", verifyToken, authorizeRoles("Admin"), AdminController.restoreUserById);
 
 // Admin login with reCAPTCHA
-const AdminController = require("../controllers/AdminController.js");
 router.post("/login", AdminController.adminLogin);
 module.exports = router;
