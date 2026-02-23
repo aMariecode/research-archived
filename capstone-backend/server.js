@@ -26,6 +26,7 @@ const allowedOrigins = [
     'http://127.0.0.1:3000',
     'https://research-archived-gray.vercel.app',
     'https://research-archived.onrender.com',
+    'https://research-archived-gray.vercel.app', // Vercel frontend
     process.env.FRONTEND_URL
 ].filter(Boolean);
 
