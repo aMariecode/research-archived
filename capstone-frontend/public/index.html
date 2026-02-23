@@ -9,18 +9,12 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
 </head>
 <body>
-      <div style="width:100%;background:#ffc107;text-align:center;padding:8px 0;z-index:9999;position:relative;">
-        <a href="/admin.html" class="btn btn-warning" style="font-weight:bold;">Back to Admin Dashboard (Test)</a>
-      </div>
-    <button id="fixedBackToAdminBtn" class="btn btn-warning" style="display:none; position: fixed; top: 24px; left: 24px; z-index: 9999; box-shadow: 0 2px 8px rgba(0,0,0,0.15);" onclick="window.location.href='/admin.html'">
-      <i class="bi bi-arrow-bar-left"></i> Back to Admin Dashboard
-    </button>
   <!-- Navigation -->
   <nav class="main-nav">
     <div class="nav-container">
       <a href="/" class="nav-brand">
         <img src="CITNEWLOGO.png" alt="University of the Assumption" class="nav-brand-icon">
-        <img src="ua-logo.png" alt="UA Logo" class="nav-brand-icon" style="margin-left: 12px;">
+        <img src="UA-logo.png" alt="UA Logo" class="nav-brand-icon" style="margin-left: 12px;">
         <div class="nav-brand-text">
           <h1>University of the Assumption</h1>
           <span>Student Capstones Projects</span>
@@ -39,9 +33,6 @@
         <div id="userActions" style="display:none">
           <div class="nav-user d-flex align-items-center gap-2">
             <span id="userName">User</span>
-            <button id="backToAdminBtn" class="btn btn-warning btn-sm" style="display:none" onclick="window.location.href='/admin.html'">
-              <i class="bi bi-arrow-bar-left"></i> Back to Admin Dashboard
-            </button>
             <div class="dropdown">
               <button class="btn btn-sm btn-outline-light dropdown-toggle" data-bs-toggle="dropdown">
                 <i class="bi bi-chevron-down"></i>
@@ -185,8 +176,6 @@
 
     // Check auth status
     function checkAuth() {
-          // Always show floating back button for admins
-          const backBtnFixed = document.getElementById('fixedBackToAdminBtn');
         // DEBUG: Print user and token info
         console.log('DEBUG user:', localStorage.getItem('user'));
         console.log('DEBUG accessToken:', localStorage.getItem('accessToken'));
@@ -202,13 +191,9 @@
           // Show back to admin button if admin
           if (userData.role === 'Admin') {
             document.getElementById('adminLink').style.display = 'block';
-            const backBtn = document.getElementById('backToAdminBtn');
-            if (backBtn) backBtn.style.display = 'inline-block';
-            if (backBtnFixed) backBtnFixed.style.display = 'block';
+              // The back button is removed for Admins
           } else {
-            const backBtn = document.getElementById('backToAdminBtn');
-            if (backBtn) backBtn.style.display = 'none';
-            if (backBtnFixed) backBtnFixed.style.display = 'none';
+            // The back button is hidden for non-admins
           }
         } catch (e) {}
       } else if (token === 'undefined' || token === 'null') {
