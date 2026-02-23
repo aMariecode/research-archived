@@ -107,8 +107,8 @@
         if (!res.ok) {
           alert(data.message || 'Login failed');
         } else {
-          alert('Login successful!');
-          // Redirect as needed
+          // Redirect to admin dashboard after successful login
+          window.location.href = "admin.html";
         }
       } catch (err) {
         alert('Network error. Please try again.');
