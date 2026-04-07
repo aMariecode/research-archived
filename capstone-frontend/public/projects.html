@@ -1,0 +1,841 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>UA Research Archive — Capstone Library</title>
+  <link rel="stylesheet" href="style.css">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+</head>
+<body>
+  <!-- Navigation -->
+  <nav class="main-nav">
+    <div class="nav-container">
+      <a href="/" class="nav-brand">
+        <img src="CITNEWLOGO.png" alt="University of the Assumption" class="nav-brand-icon">
+        <img src="UA-logo.png" alt="UA Logo" class="nav-brand-icon" style="margin-left: 12px;">
+        <div class="nav-brand-text">
+          <h1>University of the Assumption</h1>
+          <span>Student Capstones Projects</span>
+        </div>
+      </a>
+      
+      <ul class="nav-menu">
+        <li><a href="/index.html"><i class="bi bi-house"></i> Home</a></li>
+        <li><a href="#projects" class="active"><i class="bi bi-collection"></i> Projects</a></li>
+      </ul>
+      
+      <div class="nav-actions">
+        <div id="guestActions">
+          <a href="/login.html" class="btn btn-outline-light btn-sm">Sign In</a>
+        </div>
+        <div id="userActions" style="display:none">
+          <div class="nav-user d-flex align-items-center gap-2">
+            <span id="userName">User</span>
+            <div class="dropdown">
+              <button class="btn btn-sm btn-outline-light dropdown-toggle" data-bs-toggle="dropdown">
+              </button>
+              <ul class="dropdown-menu dropdown-menu-end">
+                <li id="adminLink" style="display:none"><a class="dropdown-item" href="/admin.html"><i class="bi bi-speedometer2"></i> Admin Dashboard</a></li>
+                <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#settingsModal"><i class="bi bi-gear"></i> Settings</a></li>
+                <li><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item" href="#" onclick="logout()"><i class="bi bi-box-arrow-right"></i> Logout</a></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <div id="maintenanceBanner" class="maintenance-banner" style="display:none;">
+    <div class="maintenance-banner-inner">
+      <i class="bi bi-exclamation-triangle-fill maintenance-banner-icon"></i>
+      <div>
+        <span id="maintenanceTitle" class="maintenance-banner-title"></span>
+        <span id="maintenanceMessage" class="maintenance-banner-message"></span>
+        <span id="maintenanceTime" class="maintenance-banner-time" style="display:none;"></span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="hero-content">
+      <h1><i class="bi bi-mortarboard"></i> Explore Student Research</h1>
+      <p>Discover innovative capstone projects from the Bachelor of Information Technology program at the University of the Assumption</p>
+      
+      <div class="hero-search">
+        <input type="text" id="searchInput" placeholder="Search projects by title, author, or keyword...">
+        <button class="btn btn-primary" onclick="searchProjects()">
+          <i class="bi bi-search"></i> Search
+        </button>
+      </div>
+      
+      <div class="hero-stats">
+        <div class="hero-stat">
+          <div class="hero-stat-value" id="statProjects">0</div>
+          <div class="hero-stat-label">Projects</div>
+        </div>
+        <div class="hero-stat">
+          <div class="hero-stat-value" id="statYears">0</div>
+          <div class="hero-stat-label">Batch Years</div>
+        </div>
+        <div class="hero-stat">
+          <div class="hero-stat-value" id="statAuthors">0</div>
+          <div class="hero-stat-label">Authors</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Filter Section -->
+  <section class="filter-section">
+    <div class="filter-container">
+      <div class="filter-options">
+        <select class="filter-select" id="yearSelect" onchange="filterByYear(this.value)">
+          <option value="all">All Years</option>
+          <!-- Year options will be dynamically added -->
+        </select>
+      </div>
+
+      
+      <div class="filter-options">
+        <select class="filter-select" id="sortSelect" onchange="sortProjects()">
+          <option value="newest">Newest First</option>
+          <option value="oldest">Oldest First</option>
+          <option value="title">Title A-Z</option>
+        </select>
+      </div>
+    </div>
+  </section>
+
+  <!-- Projects Section -->
+  <section class="projects-section" id="projects">
+    <div class="projects-header">
+      <h2><i class="bi bi-grid-3x3-gap"></i> Capstone Projects</h2>
+      <span class="projects-count" id="projectsCount">Loading...</span>
+    </div>
+    
+    <div class="projects-grid" id="projectsGrid">
+      <!-- Project cards will be dynamically added -->
+    </div>
+    <div id="projectsPagination" class="mt-4"></div>
+    </div>
+    
+    <div class="empty-state" id="emptyState" style="display:none">
+      <div class="empty-state-icon"><i class="bi bi-inbox"></i></div>
+      <h3>No projects found</h3>
+      <p>Try adjusting your search or filter criteria</p>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="main-footer" style="position: relative; z-index: 1;">
+    <div class="footer-content">
+      <div class="footer-section">
+        <h4>UA Research Archive</h4>
+        <p>A digital repository for capstone projects from the Bachelor of Information Technology program at the University of the Assumption.</p>
+      </div>
+      <div class="footer-section">
+        <h4>Quick Links</h4>
+        <a href="/index.html">Home</a>
+        <a href="/projects.html">Browse Projects</a>
+        <a href="/login.html">Sign In</a>
+      </div>
+      <div class="footer-section">
+        <h4>Contact</h4>
+        <p>University of the Assumption<br>City of San Fernando, Pampanga<br>
+        <a href="mailto:cit@ua.edu.ph">cit@ua.edu.ph</a></p>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2026 UA Research Archive. Bachelor of Information Technology.</p>
+    </div>
+  </footer>
+
+  <!-- Project Detail Modal -->
+  <div class="modal fade" id="projectModal" tabindex="-1">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="modalTitle">Project Details</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body" id="modalBody">
+          <!-- Content will be dynamically added -->
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-primary" id="viewPdfBtn">
+            <i class="bi bi-eye"></i> View PDF
+          </button>
+          <button type="button" class="btn btn-success" id="downloadPdfBtn">
+            <i class="bi bi-download"></i> Download
+          </button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    const BACKEND = `http://localhost:4000/api`;
+    let allProjects = [];
+    let filteredProjects = [];
+    let currentYear = 'all';
+    let currentProject = null;
+    let maintenancePollInterval = null;
+  // Pagination variables for projects
+  let projectCurrentPage = 1;
+  const projectPageSize = 9;
+
+    // Check auth status
+    function checkAuth() {
+        // DEBUG: Print user and token info
+        console.log('DEBUG user:', localStorage.getItem('user'));
+        console.log('DEBUG accessToken:', localStorage.getItem('accessToken'));
+      const token = localStorage.getItem('accessToken');
+      const user = localStorage.getItem('user');
+      
+      if (token && token !== 'undefined' && token !== 'null' && user) {
+        try {
+          const userData = JSON.parse(user);
+          document.getElementById('guestActions').style.display = 'none';
+          document.getElementById('userActions').style.display = 'block';
+          document.getElementById('userName').textContent = userData.fullName || 'User';
+          // Show back to admin button if admin
+          if (userData.role === 'Admin') {
+            document.getElementById('adminLink').style.display = 'block';
+              // The back button is removed for Admins
+          } else {
+            // The back button is hidden for non-admins
+          }
+        } catch (e) {}
+      } else if (token === 'undefined' || token === 'null') {
+        localStorage.removeItem('accessToken');
+      }
+    }
+
+    function logout() {
+      localStorage.removeItem('accessToken');
+      localStorage.removeItem('user');
+      window.location.href = '/login.html';
+    }
+
+    function formatMaintenanceTime(value) {
+      if (!value) return '';
+      const parsed = new Date(value);
+      if (Number.isNaN(parsed.getTime())) return '';
+      return parsed.toLocaleString([], {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+    }
+
+    function renderMaintenanceNotice(data) {
+      const banner = document.getElementById('maintenanceBanner');
+      const title = document.getElementById('maintenanceTitle');
+      const message = document.getElementById('maintenanceMessage');
+      const time = document.getElementById('maintenanceTime');
+
+      if (!banner || !title || !message || !time) return;
+
+      if (!data?.isActive) {
+        banner.style.display = 'none';
+        return;
+      }
+
+      title.textContent = data.title || 'Scheduled Maintenance';
+      message.textContent = data.message || 'The system is currently under maintenance. Some features may be temporarily unavailable.';
+
+      const expected = formatMaintenanceTime(data.expectedBackAt);
+      if (expected) {
+        time.textContent = `Expected to be back: ${expected}`;
+        time.style.display = 'block';
+      } else {
+        time.style.display = 'none';
+      }
+
+      banner.style.display = 'block';
+    }
+
+    async function loadMaintenanceNotice() {
+      try {
+        const res = await fetch(`${BACKEND}/system/maintenance`);
+        if (!res.ok) return;
+        const body = await res.json();
+        renderMaintenanceNotice(body.data || {});
+      } catch (err) {
+        console.error('Failed to load maintenance notice:', err);
+      }
+    }
+
+    function initMaintenanceNotifier() {
+      loadMaintenanceNotice();
+      if (maintenancePollInterval) clearInterval(maintenancePollInterval);
+      maintenancePollInterval = setInterval(loadMaintenanceNotice, 60000);
+    }
+
+    // Fetch projects from backend
+    async function fetchProjects() {
+      try {
+        const res = await fetch(`${BACKEND}/capstone/approved`);
+        if (!res.ok) throw new Error('Failed to fetch');
+        const data = await res.json();
+        allProjects = data.data || [];
+        filteredProjects = [...allProjects];
+        
+        updateStats();
+        generateYearTabs();
+        renderProjects();
+      } catch (err) {
+        console.error('Error fetching projects:', err);
+        document.getElementById('projectsCount').textContent = 'Error loading projects';
+      }
+    }
+
+    // Update stats
+    function updateStats() {
+      document.getElementById('statProjects').textContent = allProjects.length;
+      
+      const years = [...new Set(allProjects.map(p => p.year))];
+      document.getElementById('statYears').textContent = years.length;
+      
+      let authorCount = 0;
+      allProjects.forEach(p => {
+        authorCount += (p.members || []).length;
+      });
+      document.getElementById('statAuthors').textContent = authorCount;
+    }
+
+    // Generate year filter dropdown
+    function generateYearTabs() {
+      const years = [...new Set(allProjects.map(p => p.year))].sort((a, b) => b - a);
+      const yearSelect = document.getElementById('yearSelect');
+
+      // Reset options
+      yearSelect.innerHTML = '<option value="all">All Years</option>';
+
+      // Add year options dynamically
+      years.forEach(year => {
+        const option = document.createElement('option');
+        option.value = year;
+        option.textContent = year;
+        yearSelect.appendChild(option);
+      });
+    }
+
+    // Handle year filter change
+    function filterByYear(year) {
+      currentYear = year;
+      applyFilters();
+    }
+    
+    // Filter by year
+    function filterByYear(year) {
+      currentYear = year;
+      
+      // Update active tab
+      document.querySelectorAll('.filter-tab').forEach(tab => {
+        tab.classList.toggle('active', tab.dataset.year == year);
+      });
+      
+      applyFilters();
+    }
+
+    // Search projects
+    function searchProjects() {
+      applyFilters();
+    }
+
+    // Sort projects
+    function sortProjects() {
+      applyFilters();
+    }
+
+    // Apply all filters
+    function applyFilters() {
+      const searchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
+      const sortBy = document.getElementById('sortSelect').value;
+      
+      filteredProjects = allProjects.filter(project => {
+        // Year filter (from year tabs)
+        if (currentYear !== 'all' && project.year != currentYear) return false;
+        
+        // Search filter
+        if (searchTerm) {
+          const title = (project.title || '').toLowerCase();
+          const abstract = (project.abstract || '').toLowerCase();
+          const authors = (project.members || []).join(' ').toLowerCase();
+          const adviser = (project.adviser || '').toLowerCase();
+          const technologies = (project.technologies || []).join(' ').toLowerCase();
+          const year = String(project.year || '');
+          
+          // Check if search term matches any field
+          if (!title.includes(searchTerm) && 
+              !abstract.includes(searchTerm) && 
+              !authors.includes(searchTerm) &&
+              !adviser.includes(searchTerm) &&
+              !technologies.includes(searchTerm) &&
+              !year.includes(searchTerm)) {
+            return false;
+          }
+        }
+        
+        return true;
+      });
+      
+      // Sort
+      filteredProjects.sort((a, b) => {
+        switch (sortBy) {
+          case 'newest': return (b.year || 0) - (a.year || 0);
+          case 'oldest': return (a.year || 0) - (b.year || 0);
+          case 'title': return (a.title || '').localeCompare(b.title || '');
+          default: return 0;
+        }
+      });
+      
+      projectCurrentPage = 1; // Reset to first page on filter
+      renderProjects();
+    }
+
+    // Render projects
+    function renderProjects() {
+      const grid = document.getElementById('projectsGrid');
+      const paginationDiv = document.getElementById('projectsPagination');
+      const emptyState = document.getElementById('emptyState');
+      const countEl = document.getElementById('projectsCount');
+
+      if (filteredProjects.length === 0) {
+        grid.innerHTML = '';
+        if (paginationDiv) paginationDiv.innerHTML = '';
+        emptyState.style.display = 'block';
+        countEl.textContent = '0 projects';
+        return;
+      }
+
+      emptyState.style.display = 'none';
+      countEl.textContent = `${filteredProjects.length} project${filteredProjects.length !== 1 ? 's' : ''}`;
+
+      // Pagination logic
+      const totalPages = Math.ceil(filteredProjects.length / projectPageSize);
+      if (projectCurrentPage > totalPages) projectCurrentPage = totalPages;
+      if (projectCurrentPage < 1) projectCurrentPage = 1;
+      const startIdx = (projectCurrentPage - 1) * projectPageSize;
+      const endIdx = startIdx + projectPageSize;
+      const pageProjects = filteredProjects.slice(startIdx, endIdx);
+
+      grid.innerHTML = pageProjects.map(project => `
+        <div class="project-card">
+          <div class="project-card-image">
+            ${project.previewImage?.url 
+              ? `<img src="${project.previewImage.url}" alt="${project.title}">`
+              : '<div class="placeholder-icon"><i class="bi bi-file-earmark-text"></i></div>'
+            }
+            <span class="project-card-year">${project.year || 'N/A'}</span>
+          </div>
+          <div class="project-card-body">
+            <h3 class="project-card-title">${project.title || 'Untitled'}</h3>
+            <p class="project-card-authors">
+              <i class="bi bi-people"></i>
+              ${(project.members || []).join(', ') || 'No authors listed'}
+            </p>
+            <p class="project-card-abstract">${project.abstract || 'No abstract available'}</p>
+            <div class="project-card-footer d-flex gap-2">
+              <button class="btn btn-outline-primary btn-sm flex-fill" onclick="viewProject('${project._id}')">
+                <i class="bi bi-eye"></i> Details
+              </button>
+              ${project.link ? `
+                <button class="btn btn-accent btn-sm flex-fill" onclick="openApp('${project.link}')">
+                  <i class="bi bi-box-arrow-up-right"></i> Open App
+                </button>
+              ` : `<div class="flex-fill text-center text-muted small border rounded py-2" style="background:#f8f9fa;">No App Link</div>`}
+            </div>
+          </div>
+        </div>
+      `).join('');
+
+      // Pagination controls
+      let paginationHtml = '';
+      if (totalPages > 1) {
+        paginationHtml += `<nav><ul class="pagination justify-content-center">`;
+        paginationHtml += `<li class="page-item${projectCurrentPage === 1 ? ' disabled' : ''}"><a class="page-link" href="#" onclick="changeProjectPage(${projectCurrentPage - 1});return false;">Previous</a></li>`;
+        for (let i = 1; i <= totalPages; i++) {
+          paginationHtml += `<li class="page-item${projectCurrentPage === i ? ' active' : ''}"><a class="page-link" href="#" onclick="changeProjectPage(${i});return false;">${i}</a></li>`;
+        }
+        paginationHtml += `<li class="page-item${projectCurrentPage === totalPages ? ' disabled' : ''}"><a class="page-link" href="#" onclick="changeProjectPage(${projectCurrentPage + 1});return false;">Next</a></li>`;
+        paginationHtml += `</ul></nav>`;
+      }
+      if (paginationDiv) paginationDiv.innerHTML = paginationHtml;
+    }
+
+    // Change page for projects
+    window.changeProjectPage = function(page) {
+      projectCurrentPage = page;
+      renderProjects();
+    }
+
+    // View project details
+    function viewProject(id) {
+      const project = allProjects.find(p => p._id === id);
+      if (!project) return;
+      
+      currentProject = project;
+      
+      document.getElementById('modalTitle').textContent = project.title || 'Project Details';
+      document.getElementById('modalBody').innerHTML = `
+        <div class="row">
+          <div class="col-md-5">
+            ${project.previewImage?.url 
+              ? `<img src="${project.previewImage.url}" class="img-fluid rounded mb-3" alt="${project.title}">`
+              : '<div class="bg-light rounded p-5 text-center text-muted mb-3"><i class="bi bi-image" style="font-size: 3rem;"></i></div>'
+            }
+          </div>
+          <div class="col-md-7">
+            <h4>${project.title || 'Untitled'}</h4>
+            <p class="text-muted mb-2"><i class="bi bi-calendar"></i> Batch ${project.year || 'N/A'}</p>
+            <p class="mb-3"><i class="bi bi-people text-accent"></i> <strong>Authors:</strong><br>${(project.members || []).join(', ') || 'Not specified'}</p>
+            ${project.adviser ? `<p class="mb-3"><i class="bi bi-person-badge"></i> <strong>Adviser:</strong> ${project.adviser}</p>` : ''}
+            ${project.link ? `<p class="mb-3"><i class="bi bi-link-45deg"></i> <strong>App Link:</strong> <a href="${project.link}" target="_blank" rel="noopener noreferrer">${project.link}</a></p>` : ''}
+          </div>
+        </div>
+        <hr>
+        <h5>Abstract</h5>
+        <p>${project.abstract || 'No abstract available'}</p>
+      `;
+      // Add Open App button to modal footer if link exists
+      const modalFooter = document.querySelector('#projectModal .modal-footer');
+      if (modalFooter) {
+        let openAppBtn = document.getElementById('openAppBtn');
+        if (openAppBtn) openAppBtn.remove();
+        if (project.link) {
+          openAppBtn = document.createElement('button');
+          openAppBtn.id = 'openAppBtn';
+          openAppBtn.className = 'btn btn-accent';
+          openAppBtn.style.margin = '0 8px';
+          openAppBtn.innerHTML = '<i class="bi bi-box-arrow-up-right"></i> Open App';
+          openAppBtn.onclick = () => openApp(project.link);
+          // Insert between View PDF and Download
+          const viewBtn = document.getElementById('viewPdfBtn');
+          const downloadBtn = document.getElementById('downloadPdfBtn');
+          if (viewBtn && downloadBtn) {
+            modalFooter.insertBefore(openAppBtn, downloadBtn);
+          } else {
+            modalFooter.appendChild(openAppBtn);
+          }
+        }
+      }
+      
+      // Setup PDF buttons - use backend proxy for proper PDF headers
+      const viewBtn = document.getElementById('viewPdfBtn');
+      const downloadBtn = document.getElementById('downloadPdfBtn');
+      
+      if (project.pdfUrl) {
+        viewBtn.style.display = 'inline-flex';
+        downloadBtn.style.display = 'inline-flex';
+        // Use backend endpoint that sets proper Content-Type and Content-Disposition
+        viewBtn.onclick = () => window.open(`${BACKEND}/capstone/${project._id}/pdf`, '_blank');
+        downloadBtn.onclick = () => downloadPdf(project._id, project.title);
+      } else {
+        viewBtn.style.display = 'none';
+        downloadBtn.style.display = 'none';
+      }
+      
+      // Track view analytics
+      trackView(id);
+      
+      new bootstrap.Modal(document.getElementById('projectModal')).show();
+    }
+
+    // Download PDF using backend proxy endpoint
+    function downloadPdf(capstoneId, title) {
+      // Clean title for filename
+      const cleanTitle = (title || 'capstone').replace(/[^a-zA-Z0-9_-]/g, '_');
+      const filename = `${cleanTitle}.pdf`;
+      
+      // Use backend endpoint with download=1 parameter for attachment disposition
+      const downloadUrl = `${BACKEND}/capstone/${capstoneId}/pdf?download=1`;
+      
+      // Create a temporary link to trigger download
+      const link = document.createElement('a');
+      link.href = downloadUrl;
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
+      // Track download
+      if (currentProject) {
+        trackDownload(currentProject._id);
+      }
+    }
+
+    // Track view analytics
+    async function trackView(id) {
+      try {
+        const token = localStorage.getItem('accessToken');
+        const headers = token ? { 'Authorization': `Bearer ${token}` } : {};
+        await fetch(`${BACKEND}/capstone/analytics/view/${id}`, {
+          method: 'POST',
+          headers
+        });
+      } catch (e) {}
+    }
+
+    // Track download analytics
+    async function trackDownload(id) {
+      try {
+        const token = localStorage.getItem('accessToken');
+        const headers = token ? { 'Authorization': `Bearer ${token}` } : {};
+        await fetch(`${BACKEND}/capstone/analytics/download/${id}`, {
+          method: 'POST',
+          headers
+        });
+      } catch (e) {}
+    }
+
+    // Search on Enter key
+    document.getElementById('searchInput').addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') searchProjects();
+    });
+
+    // Track site visit
+    async function trackSiteVisit() {
+      try {
+        await fetch(`${BACKEND}/capstone/analytics/visit`, { method: 'POST' });
+      } catch (e) {}
+    }
+
+    // Initialize
+    document.addEventListener('DOMContentLoaded', function() {
+      checkAuth();
+      fetchProjects();
+      trackSiteVisit();
+      initMaintenanceNotifier();
+      // Fallback: always show admin button if user is admin
+      try {
+        const user = JSON.parse(localStorage.getItem('user') || '{}');
+        if (user.role === 'Admin') {
+          const backBtnFixed = document.getElementById('fixedBackToAdminBtn');
+          if (backBtnFixed) backBtnFixed.style.display = 'block';
+        }
+      } catch (e) {}
+    });
+    
+    function openApp(url) {
+      if (url) {
+        window.open(url, '_blank', 'noopener,noreferrer');
+      } else {
+        alert('No application link available for this project.');
+      }
+    }
+
+    // Settings Modal Functions
+    function showMsg(id, type, message) {
+      const el = document.getElementById(id);
+      el.className = `alert alert-${type}`;
+      el.textContent = message;
+      el.style.display = 'block';
+    }
+
+    async function loadSettingsProfile() {
+      const token = localStorage.getItem('accessToken');
+      try {
+        const res = await fetch(`${BACKEND}/user/me`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        if (res.ok) {
+          const body = await res.json();
+          const user = body.data || {};
+          document.getElementById('settingsFullName').value = user.fullName || '';
+          document.getElementById('settingsEmail').value = user.email || '';
+        }
+      } catch (err) {
+        console.error('Error loading profile:', err);
+      }
+    }
+
+    async function saveSettingsDetails() {
+      const token = localStorage.getItem('accessToken');
+      const fullName = document.getElementById('settingsFullName').value.trim();
+      const email = document.getElementById('settingsEmail').value.trim();
+
+      if (!fullName || !email) {
+        document.getElementById('detailsError').textContent = 'Full name and email are required';
+        document.getElementById('detailsError').style.display = 'block';
+        return;
+      }
+
+      if (!confirm(`Update your details to:\n\nName: ${fullName}\nEmail: ${email}?`)) {
+        return;
+      }
+
+      try {
+        const res = await fetch(`${BACKEND}/user/me`, {
+          method: 'PUT',
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ fullName, email })
+        });
+
+        const body = await res.json();
+        if (!res.ok) {
+          document.getElementById('detailsError').textContent = body.message || 'Failed to update details';
+          document.getElementById('detailsError').style.display = 'block';
+          return;
+        }
+
+        const cached = JSON.parse(localStorage.getItem('user') || '{}');
+        cached.fullName = fullName;
+        cached.email = email;
+        localStorage.setItem('user', JSON.stringify(cached));
+        document.getElementById('userName').textContent = fullName;
+
+        document.getElementById('detailsError').style.display = 'none';
+        document.getElementById('detailsSuccess').textContent = 'Details updated successfully!';
+        document.getElementById('detailsSuccess').style.display = 'block';
+      } catch (err) {
+        document.getElementById('detailsError').textContent = 'Network error while saving details';
+        document.getElementById('detailsError').style.display = 'block';
+      }
+    }
+
+    async function changeSettingsPassword() {
+      const token = localStorage.getItem('accessToken');
+      const current = document.getElementById('settingsCurrentPassword').value;
+      const newPass = document.getElementById('settingsNewPassword').value;
+      const confirm = document.getElementById('settingsConfirmPassword').value;
+
+      if (!current || !newPass || !confirm) {
+        document.getElementById('passwordError').textContent = 'All fields are required';
+        document.getElementById('passwordError').style.display = 'block';
+        return;
+      }
+
+      if (newPass !== confirm) {
+        document.getElementById('passwordError').textContent = 'Passwords do not match';
+        document.getElementById('passwordError').style.display = 'block';
+        return;
+      }
+
+      if (!window.confirm('Are you sure you want to change your password?')) {
+        return;
+      }
+
+      try {
+        const res = await fetch(`${BACKEND}/user/me/password`, {
+          method: 'PATCH',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ currentPassword: current, newPassword: newPass })
+        });
+
+        if (res.ok) {
+          document.getElementById('passwordSuccess').textContent = 'Password changed successfully!';
+          document.getElementById('passwordSuccess').style.display = 'block';
+          document.getElementById('passwordError').style.display = 'none';
+          document.getElementById('settingsCurrentPassword').value = '';
+          document.getElementById('settingsNewPassword').value = '';
+          document.getElementById('settingsConfirmPassword').value = '';
+        } else {
+          const data = await res.json();
+          document.getElementById('passwordError').textContent = data.message || 'Error changing password';
+          document.getElementById('passwordError').style.display = 'block';
+        }
+      } catch (err) {
+        document.getElementById('passwordError').textContent = 'Network error. Please try again.';
+        document.getElementById('passwordError').style.display = 'block';
+      }
+    }
+
+    // Load profile when modal is shown
+    document.addEventListener('DOMContentLoaded', function() {
+      const settingsModal = document.getElementById('settingsModal');
+      if (settingsModal) {
+        settingsModal.addEventListener('show.bs.modal', function() {
+          // Clear form
+          document.getElementById('settingsFullName').value = '';
+          document.getElementById('settingsEmail').value = '';
+          document.getElementById('settingsCurrentPassword').value = '';
+          document.getElementById('settingsNewPassword').value = '';
+          document.getElementById('settingsConfirmPassword').value = '';
+          document.getElementById('detailsError').style.display = 'none';
+          document.getElementById('detailsSuccess').style.display = 'none';
+          document.getElementById('passwordError').style.display = 'none';
+          document.getElementById('passwordSuccess').style.display = 'none';
+          // Load profile
+          loadSettingsProfile();
+        });
+      }
+    });
+  </script>
+
+  <!-- Settings Modal -->
+  <div class="modal fade" id="settingsModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title"><i class="bi bi-gear"></i> Settings</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <!-- Change Details Section -->
+          <div class="settings-card mb-4">
+            <h6 class="mb-3"><i class="bi bi-person-circle"></i> Change Details</h6>
+            <div id="detailsError" class="alert alert-danger" style="display:none"></div>
+            <div id="detailsSuccess" class="alert alert-success" style="display:none"></div>
+            <div class="form-group mb-3">
+              <label class="form-label small">Full Name</label>
+              <input type="text" class="form-control" id="settingsFullName">
+            </div>
+            <div class="form-group mb-3">
+              <label class="form-label small">Email</label>
+              <input type="email" class="form-control" id="settingsEmail">
+            </div>
+            <button type="button" class="btn btn-primary btn-sm" onclick="saveSettingsDetails()">
+              <i class="bi bi-save"></i> Save Details
+            </button>
+          </div>
+
+          <hr>
+
+          <!-- Change Password Section -->
+          <div class="settings-card">
+            <h6 class="mb-3"><i class="bi bi-key"></i> Change Password</h6>
+            <div id="passwordError" class="alert alert-danger" style="display:none"></div>
+            <div id="passwordSuccess" class="alert alert-success" style="display:none"></div>
+            <div class="form-group mb-3">
+              <label class="form-label small">Current Password</label>
+              <input type="password" class="form-control" id="settingsCurrentPassword">
+            </div>
+            <div class="form-group mb-3">
+              <label class="form-label small">New Password</label>
+              <input type="password" class="form-control" id="settingsNewPassword">
+            </div>
+            <div class="form-group mb-3">
+              <label class="form-label small">Confirm New Password</label>
+              <input type="password" class="form-control" id="settingsConfirmPassword">
+            </div>
+            <button type="button" class="btn btn-primary btn-sm" onclick="changeSettingsPassword()">
+              <i class="bi bi-check-circle"></i> Update Password
+            </button>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
