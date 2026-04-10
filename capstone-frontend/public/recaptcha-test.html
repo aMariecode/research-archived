@@ -2,16 +2,28 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
+  <script src="config.js"></script>
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>reCAPTCHA v2 Test</title>
 </head>
 <body>
   <h2>reCAPTCHA v2 Checkbox Test</h2>
   <form action="#">
-    <div class="g-recaptcha" data-sitekey="6LeYIHEsAAAAACwkV8ybACBWUguuxgMjtsDT2TC1"></div>
+    <div class="g-recaptcha" id="recaptcha-box"></div>
     <br>
     <button type="submit">Submit</button>
   </form>
   <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+  <script>
+    // Set reCAPTCHA site key from config
+    document.addEventListener('DOMContentLoaded', function() {
+      if (window.APP_CONFIG && window.APP_CONFIG.RECAPTCHA_SITE_KEY) {
+        var box = document.getElementById('recaptcha-box');
+        if (box) {
+          box.setAttribute('data-sitekey', window.APP_CONFIG.RECAPTCHA_SITE_KEY);
+        }
+      }
+    });
+  </script>
 </body>
 </html>

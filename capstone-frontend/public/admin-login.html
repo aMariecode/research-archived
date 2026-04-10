@@ -2,11 +2,13 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Admin Login — UA Research Archive</title>
   <link rel="stylesheet" href="style.css">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
   <!-- Admin padlock button upper left of Getting Started -->
@@ -19,7 +21,7 @@
     <!-- Left Side - Branding -->
     <div class="auth-left">
       <div class="auth-logo">
-        <img src="ua-seal.png" alt="University of the Assumption" class="auth-logo-image">
+        <img src="./UA-logo.png" alt="University of the Assumption" class="auth-logo-image">
         <div>
           <h1 style="font-size: 2rem; margin: 0; font-weight: 700;">University of the Assumption</h1>
           <span style="opacity: 0.85; font-size: 0.9rem;">College of Information Technology</span>
@@ -75,7 +77,9 @@
   </div>
   <script src="https://www.google.com/recaptcha/api.js" async defer></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="config.js"></script>
   <script>
+    // Toggle password visibility
     function togglePassword(inputId, icon) {
       const input = document.getElementById(inputId);
       if (input.type === 'password') {
@@ -88,34 +92,50 @@
         icon.classList.add('bi-eye-slash');
       }
     }
-    document.getElementById('admin-login-form').addEventListener('submit', async function(e) {
-      e.preventDefault();
-      const username = document.getElementById('admin-username').value;
-      const password = document.getElementById('admin-password').value;
-      const recaptchaToken = grecaptcha.getResponse();
-      if (!recaptchaToken) {
-        alert('Please complete the reCAPTCHA.');
-        return;
-      }
-      try {
-        const res = await fetch('https://research-archived.onrender.com/api/admin/login', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ username, password, recaptchaToken })
-        });
-        const data = await res.json();
-        if (!res.ok) {
-          alert(data.message || 'Login failed');
-        } else {
-          // Store token and user info in localStorage
-          localStorage.setItem('accessToken', data.accessToken);
-          localStorage.setItem('user', JSON.stringify(data.user));
-          // Redirect to admin dashboard after successful login
-          window.location.href = "admin.html";
+
+    // Wait for DOM and config to load
+    document.addEventListener('DOMContentLoaded', function() {
+      // Set reCAPTCHA site key from config
+      if (window.APP_CONFIG && window.APP_CONFIG.RECAPTCHA_SITE_KEY) {
+        var recaptchaDiv = document.querySelector('.g-recaptcha');
+        if (recaptchaDiv) {
+          recaptchaDiv.setAttribute('data-sitekey', window.APP_CONFIG.RECAPTCHA_SITE_KEY);
         }
-      } catch (err) {
-        alert('Network error. Please try again.');
       }
+
+      document.getElementById('admin-login-form').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const username = document.getElementById('admin-username').value;
+        const password = document.getElementById('admin-password').value;
+        const recaptchaToken = grecaptcha.getResponse();
+        if (!recaptchaToken) {
+          alert('Please complete the reCAPTCHA.');
+          return;
+        }
+        try {
+          const apiUrl = (window.APP_CONFIG && window.APP_CONFIG.API_BASE_URL) ? window.APP_CONFIG.API_BASE_URL : '';
+          const res = await fetch(apiUrl + '/api/admin/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username, password, recaptchaToken })
+          });
+          let data;
+          try {
+            data = await res.json();
+          } catch (err) {
+            data = { message: 'Invalid server response' };
+          }
+          if (!res.ok) {
+            alert(data.message || 'Login failed');
+          } else {
+            localStorage.setItem('accessToken', data.accessToken);
+            localStorage.setItem('user', JSON.stringify(data.user));
+            window.location.href = "admin.html";
+          }
+        } catch (err) {
+          alert('Network error. Please try again.');
+        }
+      });
     });
   </script>
 </body>

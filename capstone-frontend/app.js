@@ -3,8 +3,8 @@ const path = require('path');
 const app = express();
 
 // Middleware to serve static files from "public"
-// Serve `login.html` as the default index so visitors land on the login/register page
-app.use(express.static(path.join(__dirname, 'public'), { index: 'login.html' }));
+// Serve `index.html` as the default index so visitors land on the home page
+app.use(express.static(path.join(__dirname, 'public'), { index: 'index.html' }));
 
 // Example API route (optional)
 app.get('/api/hello', (req, res) => {

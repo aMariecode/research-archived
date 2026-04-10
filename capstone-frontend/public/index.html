@@ -2,11 +2,14 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
+  <script src="config.js"></script>
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>UA Research Archive — Capstone Library</title>
   <link rel="stylesheet" href="style.css">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
   <!-- Navigation -->
@@ -23,7 +26,7 @@
       
       <ul class="nav-menu">
         <li><a href="/index.html" class="active"><i class="bi bi-house"></i> Home</a></li>
-        <li><a href="#projects"><i class="bi bi-collection"></i> Projects</a></li>
+        <li><a href="/projects.html"><i class="bi bi-collection"></i> Projects</a></li>
       </ul>
       
       <div class="nav-actions">
@@ -35,10 +38,11 @@
             <span id="userName">User</span>
             <div class="dropdown">
               <button class="btn btn-sm btn-outline-light dropdown-toggle" data-bs-toggle="dropdown">
-                <i class="bi bi-chevron-down"></i>
               </button>
               <ul class="dropdown-menu dropdown-menu-end">
                 <li id="adminLink" style="display:none"><a class="dropdown-item" href="/admin.html"><i class="bi bi-speedometer2"></i> Admin Dashboard</a></li>
+                <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#settingsModal"><i class="bi bi-gear"></i> Settings</a></li>
+                <li><hr class="dropdown-divider"></li>
                 <li><a class="dropdown-item" href="#" onclick="logout()"><i class="bi bi-box-arrow-right"></i> Logout</a></li>
               </ul>
             </div>
@@ -48,76 +52,160 @@
     </div>
   </nav>
 
-  <!-- Hero Section -->
-  <section class="hero">
-    <div class="hero-content">
-      <h1><i class="bi bi-mortarboard"></i> Explore Student Research</h1>
-      <p>Discover innovative capstone projects from the Bachelor of Information Technology program at the University of the Assumption</p>
-      
-      <div class="hero-search">
-        <input type="text" id="searchInput" placeholder="Search projects by title, author, or keyword...">
-        <button class="btn btn-primary" onclick="searchProjects()">
-          <i class="bi bi-search"></i> Search
-        </button>
+  <div id="maintenanceBanner" class="maintenance-banner" style="display:none;">
+    <div class="maintenance-banner-inner">
+      <i class="bi bi-exclamation-triangle-fill maintenance-banner-icon"></i>
+      <div>
+        <span id="maintenanceTitle" class="maintenance-banner-title"></span>
+        <span id="maintenanceMessage" class="maintenance-banner-message"></span>
+        <span id="maintenanceTime" class="maintenance-banner-time" style="display:none;"></span>
       </div>
-      
-      <div class="hero-stats">
-        <div class="hero-stat">
-          <div class="hero-stat-value" id="statProjects">0</div>
-          <div class="hero-stat-label">Projects</div>
+    </div>
+  </div>
+
+  <!-- Background Watermark -->
+  <div style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); opacity: 0.04; z-index: 0; width: 90%; max-width: 1200px; pointer-events: none;">
+    <img src="CITNEWLOGO.png" alt="CIT Logo Background" style="width: 100%; height: auto; display: block;">
+  </div>
+
+
+
+  <!-- Featured Projects Section with Carousel and Stats -->
+  <section class="featured-section" style="position: relative; z-index: 1;">
+    <div class="section-container">
+      <div class="featured-header">
+        <h2 class="section-title-hover"><i class="bi bi-star-fill"></i> Featured Projects</h2>
+      </div>
+
+      <div class="featured-content">
+        <!-- Carousel Column -->
+        <div class="featured-carousel-col my-4">
+          <div id="featuredCarousel" class="carousel slide carousel-dark" data-bs-ride="carousel">
+            <div class="carousel-indicators" id="carouselIndicators">
+              <!-- Indicators will be dynamically added -->
+            </div>
+            
+            <div class="carousel-inner" id="carouselInner">
+              <!-- Carousel items will be dynamically added -->
+            </div>
+            
+            <button class="carousel-control-prev" type="button" data-bs-target="#featuredCarousel" data-bs-slide="prev">
+              <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            </button>
+            <button class="carousel-control-next" type="button" data-bs-target="#featuredCarousel" data-bs-slide="next">
+              <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            </button>
+          </div>
         </div>
-        <div class="hero-stat">
-          <div class="hero-stat-value" id="statYears">0</div>
-          <div class="hero-stat-label">Batch Years</div>
-        </div>
-        <div class="hero-stat">
-          <div class="hero-stat-value" id="statAuthors">0</div>
-          <div class="hero-stat-label">Authors</div>
+
+        <!-- Stats and Info Column -->
+        <div class="featured-stats-col">
+          <div class="stats-card">
+            <div class="stat-item">
+              <div class="stat-icon">
+                <i class="bi bi-collection"></i>
+              </div>
+              <div class="stat-content">
+                <div class="stat-value" id="statProjects">0</div>
+                <div class="stat-label">Total Projects</div>
+              </div>
+            </div>
+
+            <div class="stat-item">
+              <div class="stat-icon">
+                <i class="bi bi-calendar-range"></i>
+              </div>
+              <div class="stat-content">
+                <div class="stat-value" id="statYears">0</div>
+                <div class="stat-label">Batch Years</div>
+              </div>
+            </div>
+
+            <div class="stat-item">
+              <div class="stat-icon">
+                <i class="bi bi-people"></i>
+              </div>
+              <div class="stat-content">
+                <div class="stat-value" id="statAuthors">0</div>
+                <div class="stat-label">Authors</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="info-card">
+            <h3>Browse the Collection</h3>
+            <p>Access a curated selection of capstone projects from our IT students. Filter by year, search by topic, and discover innovative solutions to real-world problems.</p>
+            <a href="/projects.html" class="btn btn-primary w-100">
+              <i class="bi bi-arrow-right"></i> View All Projects
+            </a>
+          </div>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- Filter Section -->
-  <section class="filter-section">
-    <div class="filter-container">
-      <div class="filter-tabs" id="yearTabs">
-        <button class="filter-tab active" data-year="all">All Years</button>
-        <!-- Year tabs will be dynamically added -->
+  <!-- News & Achievements Section (Dynamic) -->
+  <section class="news-section" style="position: relative; z-index: 1;">
+    <div class="section-container">
+      <div class="news-header">
+        <h2 class="section-title-hover"><i class="bi bi-newspaper"></i> News & Achievements</h2>
+        <p class="section-subtitle">Latest announcements and research highlights</p>
       </div>
-      
-      <div class="filter-options">
-        <select class="filter-select" id="sortSelect" onchange="sortProjects()">
-          <option value="newest">Newest First</option>
-          <option value="oldest">Oldest First</option>
-          <option value="title">Title A-Z</option>
-        </select>
+      <div class="news-scroll-wrapper">
+        <div class="news-scroll" id="newsScroll">
+          <!-- News cards will be dynamically inserted here -->
+        </div>
       </div>
     </div>
   </section>
 
-  <!-- Projects Section -->
-  <section class="projects-section" id="projects">
-    <div class="projects-header">
-      <h2><i class="bi bi-grid-3x3-gap"></i> Capstone Projects</h2>
-      <span class="projects-count" id="projectsCount">Loading...</span>
-    </div>
-    
-    <div class="projects-grid" id="projectsGrid">
-      <!-- Project cards will be dynamically added -->
-    </div>
-    <div id="projectsPagination" class="mt-4"></div>
-    </div>
-    
-    <div class="empty-state" id="emptyState" style="display:none">
-      <div class="empty-state-icon"><i class="bi bi-inbox"></i></div>
-      <h3>No projects found</h3>
-      <p>Try adjusting your search or filter criteria</p>
+  <!-- About Section -->
+  <section class="about-section" style="position: relative; z-index: 1;">
+    <div class="section-container">
+      <div class="about-grid">
+        <div class="about-text">
+          <h2 class="section-title-hover">About UA Research Archive</h2>
+          <p>The University of the Assumption Research Archive is a comprehensive digital repository dedicated to preserving and showcasing the innovative projects developed by students in the Bachelor of Information Technology program.</p>
+          <p>This archive serves as a testament to the academic excellence and creativity of our IT students, providing easy access to research papers, technical documentation, and project portfolios.</p>
+          <a href="/projects.html" class="btn btn-primary">Browse Projects <i class="bi bi-arrow-right"></i></a>
+        </div>
+        
+        <div class="about-features">
+          <div class="feature-card">
+            <div class="feature-icon">
+              <i class="bi bi-search"></i>
+            </div>
+            <h4>Easy Discovery</h4>
+            <p>Search and filter by year, author, technology, and keywords</p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">
+              <i class="bi bi-file-earmark-pdf"></i>
+            </div>
+            <h4>Full Documentation</h4>
+            <p>Access complete papers, abstracts, and technical files</p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">
+              <i class="bi bi-shield-check"></i>
+            </div>
+            <h4>Quality Assured</h4>
+            <p>All projects reviewed and approved by advisers</p>
+          </div>
+          <div class="feature-card">
+            <div class="feature-icon">
+              <i class="bi bi-graph-up"></i>
+            </div>
+            <h4>Track Impact</h4>
+            <p>View engagement metrics and download statistics</p>
+          </div>
+        </div>
+      </div>
     </div>
   </section>
 
   <!-- Footer -->
-  <footer class="main-footer" id="about">
+  <footer class="main-footer" style="position: relative; z-index: 1;">
     <div class="footer-content">
       <div class="footer-section">
         <h4>UA Research Archive</h4>
@@ -126,12 +214,13 @@
       <div class="footer-section">
         <h4>Quick Links</h4>
         <a href="/index.html">Home</a>
-        <a href="#projects">Browse Projects</a>
+        <a href="/projects.html">Browse Projects</a>
         <a href="/login.html">Sign In</a>
       </div>
       <div class="footer-section">
         <h4>Contact</h4>
-        <p>University of the Assumption<br>City of San Fernando, Pampanga</p>
+        <p>University of the Assumption<br>City of San Fernando, Pampanga<br>
+        <a href="https://ssite-website.vercel.app/" target="_blank" rel="noopener">SSITE Website</a></p>
       </div>
     </div>
     <div class="footer-bottom">
@@ -139,25 +228,15 @@
     </div>
   </footer>
 
-  <!-- Project Detail Modal -->
-  <div class="modal fade" id="projectModal" tabindex="-1">
+  <div class="modal fade" id="newsDetailsModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-centered">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title" id="modalTitle">Project Details</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          <h5 class="modal-title" id="newsDetailsTitle">News Details</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
-        <div class="modal-body" id="modalBody">
-          <!-- Content will be dynamically added -->
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-outline-primary" id="viewPdfBtn">
-            <i class="bi bi-eye"></i> View PDF
-          </button>
-          <button type="button" class="btn btn-success" id="downloadPdfBtn">
-            <i class="bi bi-download"></i> Download
-          </button>
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <div class="modal-body" id="newsDetailsBody">
+          <!-- Content will be injected by JS -->
         </div>
       </div>
     </div>
@@ -165,20 +244,13 @@
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
   <script>
-    const BACKEND = `https://research-archived.onrender.com/api`;
+    // Use API URL from config.js
+    const BACKEND = (window.APP_CONFIG && window.APP_CONFIG.API_BASE_URL) ? window.APP_CONFIG.API_BASE_URL + '/api' : '/api';
     let allProjects = [];
-    let filteredProjects = [];
-    let currentYear = 'all';
-    let currentProject = null;
-  // Pagination variables for projects
-  let projectCurrentPage = 1;
-  const projectPageSize = 9;
+    let maintenancePollInterval = null;
 
     // Check auth status
     function checkAuth() {
-        // DEBUG: Print user and token info
-        console.log('DEBUG user:', localStorage.getItem('user'));
-        console.log('DEBUG accessToken:', localStorage.getItem('accessToken'));
       const token = localStorage.getItem('accessToken');
       const user = localStorage.getItem('user');
       
@@ -188,12 +260,8 @@
           document.getElementById('guestActions').style.display = 'none';
           document.getElementById('userActions').style.display = 'block';
           document.getElementById('userName').textContent = userData.fullName || 'User';
-          // Show back to admin button if admin
           if (userData.role === 'Admin') {
             document.getElementById('adminLink').style.display = 'block';
-              // The back button is removed for Admins
-          } else {
-            // The back button is hidden for non-admins
           }
         } catch (e) {}
       } else if (token === 'undefined' || token === 'null') {
@@ -207,25 +275,80 @@
       window.location.href = '/login.html';
     }
 
-    // Fetch projects from backend
+    function formatMaintenanceTime(value) {
+      if (!value) return '';
+      const parsed = new Date(value);
+      if (Number.isNaN(parsed.getTime())) return '';
+      return parsed.toLocaleString([], {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+    }
+
+    function renderMaintenanceNotice(data) {
+      const banner = document.getElementById('maintenanceBanner');
+      const title = document.getElementById('maintenanceTitle');
+      const message = document.getElementById('maintenanceMessage');
+      const time = document.getElementById('maintenanceTime');
+
+      if (!banner || !title || !message || !time) return;
+
+      if (!data?.isActive) {
+        banner.style.display = 'none';
+        return;
+      }
+
+      title.textContent = data.title || 'Scheduled Maintenance';
+      message.textContent = data.message || 'The system is currently under maintenance. Some features may be temporarily unavailable.';
+
+      const expected = formatMaintenanceTime(data.expectedBackAt);
+      if (expected) {
+        time.textContent = `Expected to be back: ${expected}`;
+        time.style.display = 'block';
+      } else {
+        time.style.display = 'none';
+      }
+
+      banner.style.display = 'block';
+    }
+
+    async function loadMaintenanceNotice() {
+      try {
+        const res = await fetch(`${BACKEND}/system/maintenance`);
+        if (!res.ok) return;
+        const body = await res.json();
+        renderMaintenanceNotice(body.data || {});
+      } catch (err) {
+        console.error('Failed to load maintenance notice:', err);
+      }
+    }
+
+    function initMaintenanceNotifier() {
+      loadMaintenanceNotice();
+      if (maintenancePollInterval) clearInterval(maintenancePollInterval);
+      maintenancePollInterval = setInterval(loadMaintenanceNotice, 60000);
+    }
+
+    // Fetch projects for stats and carousel
     async function fetchProjects() {
       try {
         const res = await fetch(`${BACKEND}/capstone/approved`);
         if (!res.ok) throw new Error('Failed to fetch');
         const data = await res.json();
         allProjects = data.data || [];
-        filteredProjects = [...allProjects];
         
         updateStats();
-        generateYearTabs();
-        renderProjects();
+        buildCarousel();
+        trackSiteVisit();
       } catch (err) {
         console.error('Error fetching projects:', err);
-        document.getElementById('projectsCount').textContent = 'Error loading projects';
       }
     }
 
-    // Update stats
+    // Update stats on home page
     function updateStats() {
       document.getElementById('statProjects').textContent = allProjects.length;
       
@@ -239,268 +362,52 @@
       document.getElementById('statAuthors').textContent = authorCount;
     }
 
-    // Generate year filter tabs
-    function generateYearTabs() {
-      const years = [...new Set(allProjects.map(p => p.year))].sort((a, b) => b - a);
-      const tabsContainer = document.getElementById('yearTabs');
+    // Build carousel with featured projects
+    function buildCarousel() {
+      const featured = allProjects.sort((a, b) => (b.year || 0) - (a.year || 0)).slice(0, 5);
       
-      // Keep the "All Years" tab
-      tabsContainer.innerHTML = '<button class="filter-tab active" data-year="all" onclick="filterByYear(\'all\')">All Years</button>';
+      if (featured.length === 0) return;
+
+      const carouselInner = document.getElementById('carouselInner');
+      const indicatorsContainer = document.getElementById('carouselIndicators');
       
-      years.forEach(year => {
-        const tab = document.createElement('button');
-        tab.className = 'filter-tab';
-        tab.dataset.year = year;
-        tab.textContent = year;
-        tab.onclick = () => filterByYear(year);
-        tabsContainer.appendChild(tab);
-      });
-    }
-
-    // Filter by year
-    function filterByYear(year) {
-      currentYear = year;
-      
-      // Update active tab
-      document.querySelectorAll('.filter-tab').forEach(tab => {
-        tab.classList.toggle('active', tab.dataset.year == year);
-      });
-      
-      applyFilters();
-    }
-
-    // Search projects
-    function searchProjects() {
-      applyFilters();
-    }
-
-    // Sort projects
-    function sortProjects() {
-      applyFilters();
-    }
-
-    // Apply all filters
-    function applyFilters() {
-      const searchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
-      const sortBy = document.getElementById('sortSelect').value;
-      
-      filteredProjects = allProjects.filter(project => {
-        // Year filter (from year tabs)
-        if (currentYear !== 'all' && project.year != currentYear) return false;
-        
-        // Search filter
-        if (searchTerm) {
-          const title = (project.title || '').toLowerCase();
-          const abstract = (project.abstract || '').toLowerCase();
-          const authors = (project.members || []).join(' ').toLowerCase();
-          const adviser = (project.adviser || '').toLowerCase();
-          const technologies = (project.technologies || []).join(' ').toLowerCase();
-          const year = String(project.year || '');
-          
-          // Check if search term matches any field
-          if (!title.includes(searchTerm) && 
-              !abstract.includes(searchTerm) && 
-              !authors.includes(searchTerm) &&
-              !adviser.includes(searchTerm) &&
-              !technologies.includes(searchTerm) &&
-              !year.includes(searchTerm)) {
-            return false;
-          }
-        }
-        
-        return true;
-      });
-      
-      // Sort
-      filteredProjects.sort((a, b) => {
-        switch (sortBy) {
-          case 'newest': return (b.year || 0) - (a.year || 0);
-          case 'oldest': return (a.year || 0) - (b.year || 0);
-          case 'title': return (a.title || '').localeCompare(b.title || '');
-          default: return 0;
-        }
-      });
-      
-      projectCurrentPage = 1; // Reset to first page on filter
-      renderProjects();
-    }
-
-    // Render projects
-    function renderProjects() {
-      const grid = document.getElementById('projectsGrid');
-      const paginationDiv = document.getElementById('projectsPagination');
-      const emptyState = document.getElementById('emptyState');
-      const countEl = document.getElementById('projectsCount');
-
-      if (filteredProjects.length === 0) {
-        grid.innerHTML = '';
-        if (paginationDiv) paginationDiv.innerHTML = '';
-        emptyState.style.display = 'block';
-        countEl.textContent = '0 projects';
-        return;
-      }
-
-      emptyState.style.display = 'none';
-      countEl.textContent = `${filteredProjects.length} project${filteredProjects.length !== 1 ? 's' : ''}`;
-
-      // Pagination logic
-      const totalPages = Math.ceil(filteredProjects.length / projectPageSize);
-      if (projectCurrentPage > totalPages) projectCurrentPage = totalPages;
-      if (projectCurrentPage < 1) projectCurrentPage = 1;
-      const startIdx = (projectCurrentPage - 1) * projectPageSize;
-      const endIdx = startIdx + projectPageSize;
-      const pageProjects = filteredProjects.slice(startIdx, endIdx);
-
-      grid.innerHTML = pageProjects.map(project => `
-        <div class="project-card">
-          <div class="project-card-image">
-            ${project.previewImage?.url 
-              ? `<img src="${project.previewImage.url}" alt="${project.title}">`
-              : '<div class="placeholder-icon"><i class="bi bi-file-earmark-text"></i></div>'
-            }
-            <span class="project-card-year">${project.year || 'N/A'}</span>
-          </div>
-          <div class="project-card-body">
-            <h3 class="project-card-title">${project.title || 'Untitled'}</h3>
-            <p class="project-card-authors">
-              <i class="bi bi-people"></i>
-              ${(project.members || []).join(', ') || 'No authors listed'}
-            </p>
-            <p class="project-card-abstract">${project.abstract || 'No abstract available'}</p>
-            <div class="project-card-footer">
-              <button class="btn btn-outline-primary btn-sm" onclick="viewProject('${project._id}')">
-                <i class="bi bi-eye"></i> Details
-              </button>
-              ${project.pdfUrl ? `
-                <button class="btn btn-primary btn-sm" onclick="downloadPdf('${project._id}', '${project.title}')">
-                  <i class="bi bi-download"></i> PDF
-                </button>
-              ` : ''}
+      carouselInner.innerHTML = featured.map((project, idx) => `
+        <div class="carousel-item ${idx === 0 ? 'active' : ''}">
+          <div class="carousel-slide">
+            <div class="carousel-image">
+              ${project.previewImage?.url 
+                ? `<img src="${project.previewImage.url}" alt="${project.title}" class="d-block w-100">`
+                : '<div class="placeholder-slide"><i class="bi bi-file-earmark-text"></i></div>'
+              }
+              <div class="carousel-overlay"></div>
+            </div>
+            <div class="carousel-caption">
+              <h3>${project.title || 'Untitled'}</h3>
             </div>
           </div>
         </div>
       `).join('');
 
-      // Pagination controls
-      let paginationHtml = '';
-      if (totalPages > 1) {
-        paginationHtml += `<nav><ul class="pagination justify-content-center">`;
-        paginationHtml += `<li class="page-item${projectCurrentPage === 1 ? ' disabled' : ''}"><a class="page-link" href="#" onclick="changeProjectPage(${projectCurrentPage - 1});return false;">Previous</a></li>`;
-        for (let i = 1; i <= totalPages; i++) {
-          paginationHtml += `<li class="page-item${projectCurrentPage === i ? ' active' : ''}"><a class="page-link" href="#" onclick="changeProjectPage(${i});return false;">${i}</a></li>`;
-        }
-        paginationHtml += `<li class="page-item${projectCurrentPage === totalPages ? ' disabled' : ''}"><a class="page-link" href="#" onclick="changeProjectPage(${projectCurrentPage + 1});return false;">Next</a></li>`;
-        paginationHtml += `</ul></nav>`;
-      }
-      if (paginationDiv) paginationDiv.innerHTML = paginationHtml;
+      indicatorsContainer.innerHTML = featured.map((_, idx) => `
+        <button type="button" data-bs-target="#featuredCarousel" data-bs-slide-to="${idx}" 
+                class="${idx === 0 ? 'active' : ''}" aria-current="${idx === 0 ? 'true' : 'false'}"></button>
+      `).join('');
     }
 
-    // Change page for projects
-    window.changeProjectPage = function(page) {
-      projectCurrentPage = page;
-      renderProjects();
-    }
-
-    // View project details
+    // View project
     function viewProject(id) {
-      const project = allProjects.find(p => p._id === id);
-      if (!project) return;
-      
-      currentProject = project;
-      
-      document.getElementById('modalTitle').textContent = project.title || 'Project Details';
-      document.getElementById('modalBody').innerHTML = `
-        <div class="row">
-          <div class="col-md-5">
-            ${project.previewImage?.url 
-              ? `<img src="${project.previewImage.url}" class="img-fluid rounded mb-3" alt="${project.title}">`
-              : '<div class="bg-light rounded p-5 text-center text-muted mb-3"><i class="bi bi-image" style="font-size: 3rem;"></i></div>'
-            }
-          </div>
-          <div class="col-md-7">
-            <h4>${project.title || 'Untitled'}</h4>
-            <p class="text-muted mb-2"><i class="bi bi-calendar"></i> Batch ${project.year || 'N/A'}</p>
-            <p class="mb-3"><i class="bi bi-people text-accent"></i> <strong>Authors:</strong><br>${(project.members || []).join(', ') || 'Not specified'}</p>
-            ${project.adviser ? `<p class="mb-3"><i class="bi bi-person-badge"></i> <strong>Adviser:</strong> ${project.adviser}</p>` : ''}
-          </div>
-        </div>
-        <hr>
-        <h5>Abstract</h5>
-        <p>${project.abstract || 'No abstract available'}</p>
-      `;
-      
-      // Setup PDF buttons - use backend proxy for proper PDF headers
-      const viewBtn = document.getElementById('viewPdfBtn');
-      const downloadBtn = document.getElementById('downloadPdfBtn');
-      
-      if (project.pdfUrl) {
-        viewBtn.style.display = 'inline-flex';
-        downloadBtn.style.display = 'inline-flex';
-        // Use backend endpoint that sets proper Content-Type and Content-Disposition
-        viewBtn.onclick = () => window.open(`${BACKEND}/capstone/${project._id}/pdf`, '_blank');
-        downloadBtn.onclick = () => downloadPdf(project._id, project.title);
+      window.location.href = `/projects.html?id=${id}`;
+    }
+
+    // Navigate to projects page with search query
+    function goToProjects() {
+      const searchTerm = document.getElementById('searchInput').value.trim();
+      if (searchTerm) {
+        window.location.href = `/projects.html?search=${encodeURIComponent(searchTerm)}`;
       } else {
-        viewBtn.style.display = 'none';
-        downloadBtn.style.display = 'none';
-      }
-      
-      // Track view analytics
-      trackView(id);
-      
-      new bootstrap.Modal(document.getElementById('projectModal')).show();
-    }
-
-    // Download PDF using backend proxy endpoint
-    function downloadPdf(capstoneId, title) {
-      // Clean title for filename
-      const cleanTitle = (title || 'capstone').replace(/[^a-zA-Z0-9_-]/g, '_');
-      const filename = `${cleanTitle}.pdf`;
-      
-      // Use backend endpoint with download=1 parameter for attachment disposition
-      const downloadUrl = `${BACKEND}/capstone/${capstoneId}/pdf?download=1`;
-      
-      // Create a temporary link to trigger download
-      const link = document.createElement('a');
-      link.href = downloadUrl;
-      link.download = filename;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      
-      // Track download
-      if (currentProject) {
-        trackDownload(currentProject._id);
+        window.location.href = '/projects.html';
       }
     }
-
-    // Track view analytics
-    async function trackView(id) {
-      try {
-        const token = localStorage.getItem('accessToken');
-        const headers = token ? { 'Authorization': `Bearer ${token}` } : {};
-        await fetch(`${BACKEND}/capstone/analytics/view/${id}`, {
-          method: 'POST',
-          headers
-        });
-      } catch (e) {}
-    }
-
-    // Track download analytics
-    async function trackDownload(id) {
-      try {
-        const token = localStorage.getItem('accessToken');
-        const headers = token ? { 'Authorization': `Bearer ${token}` } : {};
-        await fetch(`${BACKEND}/capstone/analytics/download/${id}`, {
-          method: 'POST',
-          headers
-        });
-      } catch (e) {}
-    }
-
-    // Search on Enter key
-    document.getElementById('searchInput').addEventListener('keypress', (e) => {
-      if (e.key === 'Enter') searchProjects();
-    });
 
     // Track site visit
     async function trackSiteVisit() {
@@ -509,20 +416,276 @@
       } catch (e) {}
     }
 
+
+
     // Initialize
+    // --- News & Achievements Dynamic Section ---
+    async function fetchNews() {
+      try {
+        const res = await fetch(`${BACKEND}/news?visible=true`);
+        if (!res.ok) throw new Error('Failed to fetch news');
+        const data = await res.json();
+        renderNewsCards(data.data || []);
+      } catch (err) {
+        document.getElementById('newsScroll').innerHTML = '<div class="text-muted p-4">No News available.</div>';
+      }
+    }
+
+    function renderNewsCards(newsList) {
+      const container = document.getElementById('newsScroll');
+      if (!container) return;
+      if (!newsList.length) {
+        container.innerHTML = '<div class="text-muted p-4">No news or achievements yet.</div>';
+        return;
+      }
+      container.innerHTML = newsList.map(news => `
+        <div class="news-card news-card-scroll">
+          <div class="news-card-img">
+            ${news.image ? `<img src="${news.image}" alt="News Image">` : '<div class="news-img-placeholder"><i class="bi bi-image"></i></div>'}
+          </div>
+          <div class="news-badge">
+            <span class="badge-date">${news.date || ''}</span>
+          </div>
+          <div class="news-body">
+            <h3>${news.title || ''}</h3>
+            <p>${news.description ? news.description.substring(0, 80) + (news.description.length > 80 ? '...' : '') : ''}</p>
+            <button class="btn btn-outline-primary btn-sm mt-2" onclick="showNewsDetails('${encodeURIComponent(JSON.stringify(news))}')">Read More</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    window.showNewsDetails = function(newsStr) {
+      const news = JSON.parse(decodeURIComponent(newsStr));
+      document.getElementById('newsDetailsTitle').textContent = news.title || 'News Details';
+      document.getElementById('newsDetailsBody').innerHTML = `
+        <article class="news-details-article">
+          <div class="news-details-media">
+            ${news.image
+              ? `<img src="${news.image}" alt="${news.title || 'News image'}" class="news-details-image">`
+              : '<div class="news-img-placeholder-lg news-details-placeholder"><i class="bi bi-image"></i></div>'}
+          </div>
+          <div class="news-details-content">
+            <div class="news-details-meta">
+              <span class="news-details-date"><i class="bi bi-calendar3"></i> ${news.date || ''}</span>
+            </div>
+            <h4 class="news-details-heading">${news.title || ''}</h4>
+            <div class="news-details-copy">
+              <p>${news.description || ''}</p>
+            </div>
+          </div>
+        </article>
+        `;
+      bootstrap.Modal.getOrCreateInstance(document.getElementById('newsDetailsModal')).show();
+    }
+
     document.addEventListener('DOMContentLoaded', function() {
       checkAuth();
       fetchProjects();
-      trackSiteVisit();
-      // Fallback: always show admin button if user is admin
+      fetchNews();
+      initMaintenanceNotifier();
+    });
+
+    // Settings Modal Functions
+    function showMsg(id, type, message) {
+      const el = document.getElementById(id);
+      el.className = `alert alert-${type}`;
+      el.textContent = message;
+      el.style.display = 'block';
+    }
+
+    async function loadSettingsProfile() {
+      const token = localStorage.getItem('accessToken');
       try {
-        const user = JSON.parse(localStorage.getItem('user') || '{}');
-        if (user.role === 'Admin') {
-          const backBtnFixed = document.getElementById('fixedBackToAdminBtn');
-          if (backBtnFixed) backBtnFixed.style.display = 'block';
+        const res = await fetch(`${BACKEND}/user/me`, {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        if (res.ok) {
+          const body = await res.json();
+          const user = body.data || {};
+          document.getElementById('settingsFullName').value = user.fullName || '';
+          document.getElementById('settingsEmail').value = user.email || '';
         }
-      } catch (e) {}
+      } catch (err) {
+        console.error('Error loading profile:', err);
+      }
+    }
+
+    async function saveSettingsDetails() {
+      const token = localStorage.getItem('accessToken');
+      const fullName = document.getElementById('settingsFullName').value.trim();
+      const email = document.getElementById('settingsEmail').value.trim();
+
+      if (!fullName || !email) {
+        document.getElementById('detailsError').textContent = 'Full name and email are required';
+        document.getElementById('detailsError').style.display = 'block';
+        return;
+      }
+
+      if (!confirm(`Update your details to:\n\nName: ${fullName}\nEmail: ${email}?`)) {
+        return;
+      }
+
+      try {
+        const res = await fetch(`${BACKEND}/user/me`, {
+          method: 'PUT',
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ fullName, email })
+        });
+
+        const body = await res.json();
+        if (!res.ok) {
+          document.getElementById('detailsError').textContent = body.message || 'Failed to update details';
+          document.getElementById('detailsError').style.display = 'block';
+          return;
+        }
+
+        const cached = JSON.parse(localStorage.getItem('user') || '{}');
+        cached.fullName = fullName;
+        cached.email = email;
+        localStorage.setItem('user', JSON.stringify(cached));
+        document.getElementById('userName').textContent = fullName;
+
+        document.getElementById('detailsError').style.display = 'none';
+        document.getElementById('detailsSuccess').textContent = 'Details updated successfully!';
+        document.getElementById('detailsSuccess').style.display = 'block';
+      } catch (err) {
+        document.getElementById('detailsError').textContent = 'Network error while saving details';
+        document.getElementById('detailsError').style.display = 'block';
+      }
+    }
+
+    async function changeSettingsPassword() {
+      const token = localStorage.getItem('accessToken');
+      const current = document.getElementById('settingsCurrentPassword').value;
+      const newPass = document.getElementById('settingsNewPassword').value;
+      const confirm = document.getElementById('settingsConfirmPassword').value;
+
+      if (!current || !newPass || !confirm) {
+        document.getElementById('passwordError').textContent = 'All fields are required';
+        document.getElementById('passwordError').style.display = 'block';
+        return;
+      }
+
+      if (newPass !== confirm) {
+        document.getElementById('passwordError').textContent = 'Passwords do not match';
+        document.getElementById('passwordError').style.display = 'block';
+        return;
+      }
+
+      if (!window.confirm('Are you sure you want to change your password?')) {
+        return;
+      }
+
+      try {
+        const res = await fetch(`${BACKEND}/user/me/password`, {
+          method: 'PATCH',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ currentPassword: current, newPassword: newPass })
+        });
+
+        if (res.ok) {
+          document.getElementById('passwordSuccess').textContent = 'Password changed successfully!';
+          document.getElementById('passwordSuccess').style.display = 'block';
+          document.getElementById('passwordError').style.display = 'none';
+          document.getElementById('settingsCurrentPassword').value = '';
+          document.getElementById('settingsNewPassword').value = '';
+          document.getElementById('settingsConfirmPassword').value = '';
+        } else {
+          const data = await res.json();
+          document.getElementById('passwordError').textContent = data.message || 'Error changing password';
+          document.getElementById('passwordError').style.display = 'block';
+        }
+      } catch (err) {
+        document.getElementById('passwordError').textContent = 'Network error. Please try again.';
+        document.getElementById('passwordError').style.display = 'block';
+      }
+    }
+
+    // Load profile when modal is shown
+    document.addEventListener('DOMContentLoaded', function() {
+      const settingsModal = document.getElementById('settingsModal');
+      if (settingsModal) {
+        settingsModal.addEventListener('show.bs.modal', function() {
+          // Clear form
+          document.getElementById('settingsFullName').value = '';
+          document.getElementById('settingsEmail').value = '';
+          document.getElementById('settingsCurrentPassword').value = '';
+          document.getElementById('settingsNewPassword').value = '';
+          document.getElementById('settingsConfirmPassword').value = '';
+          document.getElementById('detailsError').style.display = 'none';
+          document.getElementById('detailsSuccess').style.display = 'none';
+          document.getElementById('passwordError').style.display = 'none';
+          document.getElementById('passwordSuccess').style.display = 'none';
+          // Load profile
+          loadSettingsProfile();
+        });
+      }
     });
   </script>
+
+  <!-- Settings Modal -->
+  <div class="modal fade" id="settingsModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title"><i class="bi bi-gear"></i> Settings</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <!-- Change Details Section -->
+          <div class="settings-card mb-4">
+            <h6 class="mb-3"><i class="bi bi-person-circle"></i> Change Details</h6>
+            <div id="detailsError" class="alert alert-danger" style="display:none"></div>
+            <div id="detailsSuccess" class="alert alert-success" style="display:none"></div>
+            <div class="form-group mb-3">
+              <label class="form-label small">Full Name</label>
+              <input type="text" class="form-control" id="settingsFullName">
+            </div>
+            <div class="form-group mb-3">
+              <label class="form-label small">Email</label>
+              <input type="email" class="form-control" id="settingsEmail">
+            </div>
+            <button type="button" class="btn btn-primary btn-sm" onclick="saveSettingsDetails()">
+              <i class="bi bi-save"></i> Save Details
+            </button>
+          </div>
+
+          <hr>
+
+          <!-- Change Password Section -->
+          <div class="settings-card">
+            <h6 class="mb-3"><i class="bi bi-key"></i> Change Password</h6>
+            <div id="passwordError" class="alert alert-danger" style="display:none"></div>
+            <div id="passwordSuccess" class="alert alert-success" style="display:none"></div>
+            <div class="form-group mb-3">
+              <label class="form-label small">Current Password</label>
+              <input type="password" class="form-control" id="settingsCurrentPassword">
+            </div>
+            <div class="form-group mb-3">
+              <label class="form-label small">New Password</label>
+              <input type="password" class="form-control" id="settingsNewPassword">
+            </div>
+            <div class="form-group mb-3">
+              <label class="form-label small">Confirm New Password</label>
+              <input type="password" class="form-control" id="settingsConfirmPassword">
+            </div>
+            <button type="button" class="btn btn-primary btn-sm" onclick="changeSettingsPassword()">
+              <i class="bi bi-check-circle"></i> Update Password
+            </button>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
 </body>
 </html>

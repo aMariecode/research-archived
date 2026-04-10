@@ -15,8 +15,6 @@ require("dotenv").config();
 
 const app = express();
 
-connectDB();
-
 app.use(express.json());
 app.use(express.urlencoded({extended:true}))
 // CORS configuration - supports both development and production
@@ -80,8 +78,10 @@ app.use(async (req, res, next) => {
 app.use("/api/auth", require("./routes/AuthRoutes.js"));
 app.use("/api", require("./routes/SearchRoutes.js"));
 app.use("/api/capstone", require("./routes/CapstoneRoutes.js"));
+app.use("/api/news", require("./routes/NewsRoutes.js"));
 app.use("/api/admin", require("./routes/AdminRoutes.js"));
 app.use("/api/user", require("./routes/UserRoutes.js"));
+app.use("/api/system", require("./routes/SystemRoutes.js"));
 app.use("/api/admin/analytics", require("./routes/AnalyticsRoutes.js"));
 
 // Error handling middleware
@@ -95,15 +95,35 @@ app.use((err, req, res, next) => {
 });
 
 const PORT = process.env.PORT || 4000;
-const server = app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
-});
+let server;
+
+async function startServer() {
+    try {
+        await connectDB();
+        server = app.listen(PORT, () => {
+            console.log(`Server running on port ${PORT}`);
+        });
+    } catch (err) {
+        console.error('Failed to start server:', err);
+        process.exit(1);
+    }
+}
+
+startServer();
 
 // Graceful shutdown
 
 // Graceful shutdown (fixed for Mongoose 6+)
 async function gracefulShutdown(signal) {
     console.log(`${signal} received. Shutting down gracefully...`);
+    if (!server) {
+        try {
+            await mongoose.connection.close(false);
+        } catch (err) {
+            console.error("Error closing MongoDB connection:", err);
+        }
+        process.exit(0);
+    }
     server.close(async () => {
         try {
             await mongoose.connection.close(false);

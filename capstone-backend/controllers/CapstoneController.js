@@ -19,7 +19,7 @@ exports.getAllCapstone = async (req, res) => {
         // If you want to hide unapproved capstones from users, add a filter here
         const capstone = await Capstone.find(query)
         .select(
-            "_id title abstract members adviser year technologies pdfUrl pdfPublicId githubUrl createdBy approvedBy status isApproved createdAt"
+            "_id title abstract members adviser year technologies pdfUrl pdfPublicId githubUrl link createdBy approvedBy status isApproved createdAt"
         )
         .populate([
             {
@@ -60,7 +60,7 @@ exports.getRecentCapstones = async (req, res) => {
             isApproved: true
         })
         .select(
-            "_id title abstract members adviser year technologies pdfUrl pdfPublicId githubUrl createdBy approvedBy createdAt"
+            "_id title abstract members adviser year technologies pdfUrl pdfPublicId githubUrl link createdBy approvedBy createdAt"
         )
         .populate([
             {
@@ -99,7 +99,7 @@ exports.getApprovedCapstones = async (req, res) => {
             isApproved: true
         })
         .select(
-            "_id title abstract members adviser year technologies pdfUrl pdfPublicId githubUrl createdBy approvedBy previewImage createdAt"
+            "_id title abstract members adviser year technologies pdfUrl pdfPublicId githubUrl link createdBy approvedBy previewImage createdAt"
         )
         .populate([
             {
@@ -139,7 +139,7 @@ exports.getCapstoneById = async (req, res) => {
         let query = { _id: capstoneId, isDeleted: false };
         // Show all capstones to all users (admin or not)
         const specificCapstone = await Capstone.findOne(query)
-            .select("_id title abstract members adviser year technologies pdfUrl pdfPublicId githubUrl createdBy approvedBy status isApproved createdAt")
+            .select("_id title abstract members adviser year technologies pdfUrl pdfPublicId githubUrl link createdBy approvedBy status isApproved createdAt")
             .populate([
                 { path: "createdBy", select: "_id fullName email" },
                 { path: "approvedBy", select: "_id fullName email" }
@@ -160,7 +160,8 @@ exports.getCapstoneById = async (req, res) => {
 
 exports.addCapstone = async (req, res) => {
     try {
-        const {
+
+        let {
             title,
             abstract,
             members,
@@ -168,15 +169,16 @@ exports.addCapstone = async (req, res) => {
             year,
             technologies,
             githubUrl,
+            link,
         } = req.body;
 
         console.log('Received body:', req.body);
         console.log('Received files:', req.files);
 
         // Validate required text fields
-        if (!title || !abstract || !year) {
+        if (!title || !abstract || !year || !link) {
             return res.status(400).send({
-                message: "Title, abstract, and year are required",
+                message: "Title, abstract, year, and application link are required",
             });
         }
 
@@ -267,11 +269,12 @@ exports.addCapstone = async (req, res) => {
             pdfUrl: pdfResult.url,
             pdfPublicId: pdfResult.public_id,
             githubUrl: githubUrl || '',
+            link: link || '',
             createdBy: req.user.id,
             isApproved: true,
             status: 'approved',
             previewImage: previewImageResult
-        });
+            });
 
         await newCapstone.save();
         console.log('Capstone saved to database');
@@ -374,12 +377,14 @@ exports.updateCapstone = async (req, res) => {
             return res.status(403).send({ message: "Not authorized." });
         }
 
-        const { title, abstract, members, adviser, year, technologies, githubUrl } = req.body;
+
+        let { title, abstract, members, adviser, year, technologies, githubUrl, link } = req.body;
 
         if (title !== undefined) capstone.title = title;
         if (abstract !== undefined) capstone.abstract = abstract;
         if (adviser !== undefined) capstone.adviser = adviser;
         if (githubUrl !== undefined) capstone.githubUrl = githubUrl;
+        if (link !== undefined) capstone.link = link;
 
         if (year !== undefined) {
             const yearNum = parseInt(year);

@@ -34,22 +34,34 @@ module.exports.verifyToken = async (req, res, next) => {
                 });
             }
 
-            const user = await User.findById(decodedToken.id);
+            try {
+                const user = await User.findById(decodedToken.id);
 
-            if (!user) {
-                return res.status(404).json({
-                    message: "User not found"
+                if (!user) {
+                    return res.status(404).json({
+                        message: "User not found"
+                    });
+                }
+
+                if (user.isDisabled) {
+                    return res.status(403).json({
+                        message: "Account is disabled. Please contact support."
+                    });
+                }
+
+                // Use fresh user data from DB so role checks are always up-to-date.
+                req.user = {
+                    id: user._id.toString(),
+                    email: user.email,
+                    role: user.role,
+                };
+                next();
+            } catch (dbErr) {
+                console.error('VerifyToken DB lookup error:', dbErr);
+                return res.status(503).json({
+                    message: 'Database is not ready. Please try again.'
                 });
             }
-
-            if (user.isDisabled) {
-                return res.status(403).json({
-                    message: "Account is disabled. Please contact support."
-                });
-            }
-
-            req.user = decodedToken;
-            next();
         });
 
     } catch (err) {
@@ -58,6 +70,15 @@ module.exports.verifyToken = async (req, res, next) => {
             message: "Server error during token verification"
         });
     }
+};
+
+module.exports.verifyAdmin = (req, res, next) => {
+    if (!req.user || (req.user.role || '').toLowerCase() !== 'admin') {
+        return res.status(403).json({
+            message: "Access denied: Admins only"
+        });
+    }
+    next();
 };
 
 module.exports.authorizeRoles = (...roles) => {

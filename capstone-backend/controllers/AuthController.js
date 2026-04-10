@@ -1,3 +1,14 @@
+// Placeholder for password reset request
+module.exports.requestPasswordReset = async (req, res) => {
+    // TODO: Implement password reset logic
+    return res.status(501).json({ message: "Password reset request not implemented yet." });
+};
+
+// Placeholder for password reset
+module.exports.resetPassword = async (req, res) => {
+    // TODO: Implement password reset logic
+    return res.status(501).json({ message: "Password reset not implemented yet." });
+};
 const bcrypt = require("bcryptjs");
 const User = require("../models/User.js");
 const { createAccessToken } = require("../middlewares/auth.js");
@@ -24,14 +35,15 @@ module.exports.register = async (req, res, next) => {
         });
     }
 
+    const normalizedEmail = String(email).toLowerCase().trim();
 
     const existing = await User.findOne({ 
-        email: String(email).toLowerCase().trim() 
+        email: normalizedEmail
     });
 
     if (existing) {
         return res.status(409).json({ 
-            message: "Email already in use"
+            message: "Email already registered. Please try logging in or use a different email."
         });
     };
 
@@ -39,9 +51,11 @@ module.exports.register = async (req, res, next) => {
 
     const user = await User.create({
         fullName,
-        email: String(email).toLowerCase().trim(),
+        email: normalizedEmail,
         password: hashed,
     });
+
+    console.log(`New student user registered: ${user.email}`);
 
     return res.status(201).send({
         message: `Registration complete. Welcome, ${user.fullName}`,
@@ -76,11 +90,13 @@ module.exports.login = async (req, res, next) => {
         });
     }
 
+    const normalizedEmail = String(email).toLowerCase().trim();
+
     const user = await User.findOne({ 
-        email: String(email).toLowerCase().trim() 
+        email: normalizedEmail
     }).select("+password");
 
-    console.log('Login attempt for:', String(email).toLowerCase().trim());
+    console.log('Login attempt for:', normalizedEmail);
     console.log('Found user?', !!user);
     if (user) console.log('user flags: isDeleted=', user.isDeleted, 'isDisabled=', user.isDisabled, 'passwordHashExists=', !!user.password);
 
@@ -92,7 +108,7 @@ module.exports.login = async (req, res, next) => {
 
     if (user.isDisabled) {
         return res.status(403).send({ 
-            message: "Account is disabled" 
+            message: "Account is disabled. Please contact support." 
         })
     };
 
@@ -107,6 +123,9 @@ module.exports.login = async (req, res, next) => {
     // Update lastLogin timestamp
     user.lastLogin = new Date();
     await user.save();
+    
+    console.log(`Successful login: ${user.email}`);
+    
     return res.status(200).send({
         message: `Login Successful`,
         user: { id: user._id, fullName: user.fullName, email: user.email, role: user.role, lastLogin: user.lastLogin },

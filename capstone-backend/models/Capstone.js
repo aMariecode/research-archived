@@ -65,6 +65,11 @@ const capstoneSchema = new mongoose.Schema(
       trim: true,
       default: "",
     },
+    link: {
+      type: String,
+      trim: true,
+      default: "",
+    },
     createdBy: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",

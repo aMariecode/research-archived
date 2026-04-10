@@ -28,6 +28,7 @@ const projection = {
   year: 1,
   technologies: 1,
   githubUrl: 1,
+  link: 1,
   pdfUrl: 1,
   createdBy: 1,
   createdAt: 1,

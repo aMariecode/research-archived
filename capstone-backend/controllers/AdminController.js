@@ -67,7 +67,7 @@ exports.getAllUsers = async (req, res) => {
             isDeleted: false,
         })
         .select(
-            "_id fullName email role lastLogin"
+            "_id fullName email role isDisabled lastLogin"
         );
 
         if(!users || users.length === 0) {
@@ -225,7 +225,7 @@ exports.getAllCapstones = async (req, res) => {
             isDeleted: false
         })
         .select(
-            "_id title abstract members adviser year technologies pdfUrl pdfPublicId githubUrl createdBy approvedBy status isApproved createdAt"
+            "_id title abstract members adviser year technologies pdfUrl pdfPublicId githubUrl link previewImage createdBy approvedBy status isApproved createdAt"
         )
         .populate([
             {
@@ -534,3 +534,92 @@ exports.restoreUserById = async (req, res) => {
         });
     }
 }
+
+exports.updateUserRoleById = async (req, res) => {
+    try {
+        const userId = req.params.userId;
+        const { role } = req.body;
+
+        const allowedRoles = ["Viewer", "Faculty", "Admin"];
+        if (!allowedRoles.includes(role)) {
+            return res.status(400).send({ message: "Invalid role." });
+        }
+
+        const specificUser = await User.findOne({
+            _id: userId,
+            isDeleted: false,
+        }).select("_id fullName email role");
+
+        if (!specificUser) {
+            return res.status(404).send({
+                message: `User with the ID: ${userId} not found!`
+            });
+        }
+
+        if (req.user.id === userId) {
+            return res.status(403).send({
+                message: "You cannot change your own role."
+            });
+        }
+
+        specificUser.role = role;
+        await specificUser.save();
+
+        return res.status(200).send({
+            message: "User role updated successfully",
+            data: {
+                _id: specificUser._id,
+                fullName: specificUser.fullName,
+                email: specificUser.email,
+                role: specificUser.role,
+            }
+        });
+    } catch (err) {
+        console.log(`User Role Update Error: ${err}`);
+        return res.status(500).send({
+            message: "Server error when updating user role",
+        });
+    }
+};
+
+exports.updateUserStatusById = async (req, res) => {
+    try {
+        const userId = req.params.userId;
+        const { isDisabled } = req.body;
+
+        const specificUser = await User.findOne({
+            _id: userId,
+            isDeleted: false,
+        }).select("_id fullName email role isDisabled");
+
+        if (!specificUser) {
+            return res.status(404).send({
+                message: `User with the ID: ${userId} not found!`
+            });
+        }
+
+        if (req.user.id === userId) {
+            return res.status(403).send({ message: "You cannot disable your own account." });
+        }
+
+        if ((specificUser.role || "").toLowerCase() === "admin") {
+            return res.status(403).send({ message: "Unauthorized: Forbidden to modify admin account." });
+        }
+
+        specificUser.isDisabled = Boolean(isDisabled);
+        await specificUser.save();
+
+        return res.status(200).send({
+            message: "User status updated successfully",
+            data: {
+                _id: specificUser._id,
+                isDisabled: specificUser.isDisabled,
+            }
+        });
+    } catch (err) {
+        console.log(`User Status Update Error: ${err}`);
+        return res.status(500).send({
+            message: "Server error when updating user status",
+        });
+    }
+};

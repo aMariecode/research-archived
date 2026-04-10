@@ -16,6 +16,8 @@ router.patch("/capstone/approve/:capstoneId", verifyToken, authorizeRoles("Admin
 router.patch("/capstone/reject/:capstoneId", verifyToken, authorizeRoles("Admin"), AdminController.rejectCapstoneById);
 router.patch("/user/archive/:userId", verifyToken, authorizeRoles("Admin"), AdminController.deleteUserById);
 router.patch("/user/restore/:userId", verifyToken, authorizeRoles("Admin"), AdminController.restoreUserById);
+router.patch("/user/:userId/role", verifyToken, authorizeRoles("Admin"), AdminController.updateUserRoleById);
+router.patch("/user/:userId/status", verifyToken, authorizeRoles("Admin"), AdminController.updateUserStatusById);
 
 // Admin login with reCAPTCHA
 router.post("/login", AdminController.adminLogin);
